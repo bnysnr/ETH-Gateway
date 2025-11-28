@@ -35,7 +35,7 @@ def get_status_description(value):
     return STATUS_DESCRIPTIONS.get(value, "UNKNOWN")
 
 
-def create_table_item(text, font, is_status=False, status_value='00'):
+def create_table_item(text, font, status_value, is_status=False, ):
     """Erstellt ein formatiertes Table-Item"""
     item = QTableWidgetItem(text)
     item.setFont(font)
@@ -43,7 +43,7 @@ def create_table_item(text, font, is_status=False, status_value='00'):
     
     # Farbcodierung für Status-Spalte
     if is_status:
-        if status_value == '00':
+        if int(status_value) == 0:
             item.setForeground(QBrush(QColor("green")))
         else:
             item.setForeground(QBrush(QColor("red")))

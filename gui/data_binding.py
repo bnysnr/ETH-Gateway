@@ -29,8 +29,8 @@ class DataBinding:
             status_item = create_table_item(
                 str(val), 
                 self.gui_font, 
-                is_status=True,
-                status_value=str(val)
+                status_value=str(val),
+                is_status=True
             )
             self.sensor_config_table.setItem(i, 1, status_item)
             

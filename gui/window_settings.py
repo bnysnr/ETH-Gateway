@@ -1,4 +1,3 @@
-# gui/window_settings.py
 """Fenstereinstellungen und Konstanten"""
 
 # Fenster-Einstellungen
