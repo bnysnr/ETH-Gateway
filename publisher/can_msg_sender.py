@@ -221,6 +221,7 @@ class can_msg_sender():
                     self.vhc_can_val_arr = vdy_signal_parameters
                     float_payload = b''.join(struct.pack("<f", v) for v in vdy_signal_parameters)
                     self.udp_sender_sock.sendto(float_payload, (self.UDP_OUT_IP, self.UDP_OUT_PORT))
+                    print("Egomotion nachricht über UDP gesendet")
 
                 
                 print(f"CAN Daten: {self.get_vhc_can_val_arr()}")
