@@ -228,6 +228,8 @@ class can_msg_sender():
                 self.send_udp_to_all(sock, self.radar_ips, udp_payload)
                 time.sleep(0.02)
                 sqc = (sqc + 1) % 256
+                while self.radar_ips is None:
+                    print("Kein Radarsensor angeschlossen, Bitte Verbindung pürfen")
 
         except KeyboardInterrupt:
             print("\n\nBeendet")

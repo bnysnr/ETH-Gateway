@@ -1,3 +1,9 @@
+"""
+Script zum Auslesen der gesendetetn Egomotion Daten und der jeweiligen Statuswerte
+02.12.25: Eventuell ist das Script aktuell unrelevant, da Funktion schon in der Main implementiert ist
+"""
+
+
 import sys
 import os
 import time
@@ -80,7 +86,7 @@ if __name__ == "__main__":
     data_model_obj = data_interface()
     
     # Starte die Datenverarbeitung
-    data_model_obj.start()
+    # data_model_obj.start()
 
     try:
         while True:
