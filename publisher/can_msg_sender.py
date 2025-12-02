@@ -28,7 +28,7 @@ class can_msg_sender():
         self.vhc_can_val_arr = []
         self.running = False
         self.radar_ips = []
-        self.lock = threading.Lock()  # Für Thread-sichere Zugriffe
+        self.lock = threading.Lock() 
 
         # -------------------- Konstanten --------------------
         self.SOURCE_IP = "192.168.16.5"
@@ -51,6 +51,10 @@ class can_msg_sender():
         self.DBC_PATH = '/home/admin/Praxissemester/dbc/J1939_MAN_1.dbc'
         self.SIGNALS_FILE = '/home/admin/Praxissemester/script/required_signals.txt'
         self.CAN_CHANNEL = 'can0'
+
+        self.UDP_OUT_IP = "127.0.0.1"     # Zieladresse (anpassen!)
+        self.UDP_OUT_PORT = 5005          # Zielport
+        self.udp_sender_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     # CRC16 Algorithmus
     def calc_crc16(self, data: bytes) -> int:
@@ -213,7 +217,11 @@ class can_msg_sender():
                 
                 # Thread-sicher aktualisieren
                 with self.lock:
+                    self.local_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                     self.vhc_can_val_arr = vdy_signal_parameters
+                    float_payload = b''.join(struct.pack("<f", v) for v in vdy_signal_parameters)
+                    self.udp_sender_sock.sendto(float_payload, (self.UDP_OUT_IP, self.UDP_OUT_PORT))
+
                 
                 print(f"CAN Daten: {self.get_vhc_can_val_arr()}")
                 self.send_udp_to_all(sock, self.radar_ips, udp_payload)

@@ -1,4 +1,3 @@
-# gui/data_binding.py
 """Daten-Binding und Live-Updates"""
 
 from PyQt5.QtWidgets import QTableWidgetItem
@@ -15,12 +14,6 @@ class DataBinding:
         self.gui_font = gui_font
     
     def update_signal_status_values(self, values):
-        """
-        Aktualisiert die Sensor-Config-Tabelle mit neuen Werten
-        
-        Args:
-            values: Liste von Werten (String oder Int)
-        """
         for i, val in enumerate(values):
             if i >= self.sensor_config_table.rowCount():
                 break
@@ -42,15 +35,19 @@ class DataBinding:
             self.sensor_config_table.setItem(i, 2, desc_item)
     
     def update_egomotion_values(self, values):
-        """
-        Aktualisiert die Egomotion-Tabelle mit neuen Werten
-        
-        Args:
-            values: Liste von Werten (als Strings)
-        """
         for i, val in enumerate(values):
             if i >= self.egomotion_table.rowCount():
                 break
+
+            # Value-Spalte
+            egomotion_value_item = create_table_item(
+                str(val), 
+                self.gui_font, 
+                status_value=str(val),
+                is_status=True
+            )
+           # print(f"TStTTTTTTTTTTTTT: {str(val)}")
+            self.egomotion_table.setItem(i, 1, egomotion_value_item)
             
             value_item = QTableWidgetItem(str(val))
             value_item.setFont(self.gui_font)

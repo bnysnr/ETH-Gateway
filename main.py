@@ -1,22 +1,24 @@
-# main.py
-"""Entry-Point für das Signal State Dashboard"""
-
 import sys
 from PyQt5.QtWidgets import QApplication
 from gui.dashboard import Dashboard
+import threading
+
+
 
 
 def main():
     """Startet die Anwendung"""
     app = QApplication(sys.argv)
-    
     dashboard = Dashboard()
+
     dashboard.show()
-    
-    # Beispiel: externe Daten einspeisen (aus anderer Quelle)
-    dashboard.update_signal_status_values(['0', '1', '0', '2', '0', '0', '1'])
-    dashboard.update_egomotion_values(['0.5', '-10', '0.2', '50', '50', '45', '45', '60', '0.1'])
-    
+
+    update_radar_status_val_thread = threading.Thread(target=dashboard.update_radar_status_thread)
+    update_radar_status_val_thread.start()
+
+    egomotion_thread = threading.Thread(target=dashboard.update_egomotion_value_thread)
+    egomotion_thread.start()
+
     sys.exit(app.exec_())
 
 

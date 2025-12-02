@@ -41,11 +41,15 @@ def create_table_item(text, font, status_value, is_status=False, ):
     item.setFont(font)
     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
     
+    """
+    
     # Farbcodierung für Status-Spalte
     if is_status:
         if int(status_value) == 0:
             item.setForeground(QBrush(QColor("green")))
         else:
             item.setForeground(QBrush(QColor("red")))
-    
+    """
+            
+
     return item
