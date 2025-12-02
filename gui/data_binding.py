@@ -39,14 +39,15 @@ class DataBinding:
             if i >= self.egomotion_table.rowCount():
                 break
 
+            formatted_val = f"{val:.4f}"
+
             # Value-Spalte
             egomotion_value_item = create_table_item(
-                str(val), 
+                str(formatted_val), 
                 self.gui_font, 
                 status_value=str(val),
                 is_status=True
             )
-           # print(f"TStTTTTTTTTTTTTT: {str(val)}")
             self.egomotion_table.setItem(i, 1, egomotion_value_item)
             
             value_item = QTableWidgetItem(str(val))
