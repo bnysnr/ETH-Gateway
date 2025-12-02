@@ -2,6 +2,7 @@
 
 from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
 from .functions import create_table_item, get_status_description
 
 
@@ -26,6 +27,12 @@ class DataBinding:
                 is_status=True
             )
             self.sensor_config_table.setItem(i, 1, status_item)
+
+            # Farbliche Darstellung
+            if int(val) != 0:
+                status_item.setForeground(QColor('red'))
+            else:
+                status_item.setForeground(QColor('green'))
             
             # Description-Spalte
             desc_text = get_status_description(int(val) if isinstance(val, str) and val.isdigit() else 0)
