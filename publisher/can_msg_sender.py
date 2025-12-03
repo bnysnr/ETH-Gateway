@@ -30,7 +30,7 @@ class can_msg_sender():
         self.radar_ips = []
         self.lock = threading.Lock() 
 
-        # -------------------- Konstanten --------------------
+        # Konstanten
         self.SOURCE_IP = "192.168.16.5"
         self.SOURCE_PORT = 2001
         self.DEST_PORT = 60000
@@ -171,8 +171,8 @@ class can_msg_sender():
         header_part1 = struct.pack("!II", message_id, someip_length)
 
         # Debug Ausgabe der Signalnamen und Werte
-        for name, val in zip(signal_names, vdy_signal_parameters):
-            print(f" {name:30s}: {val:10.3f}")
+        #for name, val in zip(signal_names, vdy_signal_parameters):
+        #    print(f" {name:30s}: {val:10.3f}")
 
         return header_part1 + header_part2 + someip_payload
 
@@ -196,7 +196,7 @@ class can_msg_sender():
 
         try:
             while self.running:
-                msg = bus.recv(timeout=1.0)
+                msg = bus.recv(timeout=0.2)
                 if msg is None:
                     continue
 
@@ -212,6 +212,8 @@ class can_msg_sender():
                         value = decoded[signal_name]
                         vdy_signal_parameters[idx] = value
                         updated = True
+                        print(f"Signalname: {signal_name} - Signalwert: {value}")
+                print("*" * 30)
 
                 if not updated:
                     continue
@@ -225,15 +227,14 @@ class can_msg_sender():
                     self.vhc_can_val_arr = vdy_signal_parameters
                     float_payload = b''.join(struct.pack("<f", v) for v in vdy_signal_parameters)
                     self.udp_sender_sock.sendto(float_payload, (self.UDP_OUT_IP, self.UDP_OUT_PORT))
-                    print("Egomotion nachricht über UDP gesendet")
+                    #print("Egomotion nachricht über UDP gesendet")
 
                 
-                print(f"CAN Daten: {self.get_vhc_can_val_arr()}")
+                #print(f"CAN Daten: {self.get_vhc_can_val_arr()}")
                 self.send_udp_to_all(sock, self.radar_ips, udp_payload)
                 time.sleep(0.02)
                 sqc = (sqc + 1) % 256
-                while self.radar_ips is None:
-                    print("Kein Radarsensor angeschlossen, Bitte Verbindung pürfen")
+                
 
         except KeyboardInterrupt:
             print("\n\nBeendet")
@@ -242,8 +243,7 @@ class can_msg_sender():
             sock.close()
 
     def get_vhc_can_val_arr(self):
-        with self.lock:
-            return self.vhc_can_val_arr.copy()
+        return self.vhc_can_val_arr
 
     def set_vhc_can_val_arr(self, arr):
         with self.lock:
@@ -290,6 +290,6 @@ if __name__ == "__main__":
     obj.start()
     try:
         while True:
-            time.sleep(1)
+            time.sleep(0.1)
     except KeyboardInterrupt:
         obj.stop()

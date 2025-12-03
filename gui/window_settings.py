@@ -22,12 +22,12 @@ EGO_SIGNALS = [
     "Yaw Rate", 
     "Steering Wheel Angle", 
     "Lateral Acceleration",
-    "Vehicle Longitudinal Acceleration",
     "Wheel Velocity Front Left", 
     "Wheel Velocity Front Right",
     "Wheel Velocity Rear Left", 
     "Wheel Velocity Rear Right",
-    "Vehicle Velocity"
+    "Vehicle Velocity",
+    "Vehicle Longitudinal Acceleration",
 ]
 
 SENSOR_CONFIG_SIGNALS = [
