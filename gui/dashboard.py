@@ -126,7 +126,7 @@ class Dashboard(QWidget):
                 pass  # keine Nachricht, weiter zum Timer-Check
 
             current_time = time.time()
-            if latest_values and (current_time - last_update_time >= 0.5):
+            if latest_values and (current_time - last_update_time >= 0): #0.5
                 self.egomotion_values_updated.emit(list(latest_values))
                 last_update_time = current_time
 

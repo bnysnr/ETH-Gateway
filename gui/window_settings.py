@@ -6,11 +6,11 @@ WINDOW_WIDTH = 1200
 WINDOW_HEIGHT = 475
 
 # Schriftart
-FONT_PATH = '/home/admin/Praxissemester/font/TTF/AUMOVIOOffice-Regular.ttf'
+FONT_PATH = '/home/admin/Desktop/ETH_Gateway/assets/fonts/AUMOVIOOffice-Regular.ttf'
 FONT_SIZE = 12
 
 # Bilder
-LOGO_PATH = "/home/admin/Praxissemester/script/Aumovio_Logo_orange_black_transparent.png"
+LOGO_PATH = "/home/admin/Desktop/ETH_Gateway/assets/image/Aumovio_Logo_orange_black_transparent.png"
 
 # Layout-Proportionen
 TITLE_BOX_HEIGHT_RATIO = 0.15
@@ -22,12 +22,12 @@ EGO_SIGNALS = [
     "Yaw Rate", 
     "Steering Wheel Angle", 
     "Lateral Acceleration",
+    "Vehicle Longitudinal Acceleration",
     "Wheel Velocity Front Left", 
     "Wheel Velocity Front Right",
     "Wheel Velocity Rear Left", 
     "Wheel Velocity Rear Right",
-    "Vehicle Velocity", 
-    "Vehicle Longitudinal Acceleration"
+    "Vehicle Velocity"
 ]
 
 SENSOR_CONFIG_SIGNALS = [

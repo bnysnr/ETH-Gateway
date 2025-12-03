@@ -48,12 +48,12 @@ class can_msg_sender():
         self.DATA_ID = 0x03E8
         self.E2E_PAYLOAD_LENGTH = 73
 
-        self.DBC_PATH = '/home/admin/Praxissemester/dbc/J1939_MAN_1.dbc'
-        self.SIGNALS_FILE = '/home/admin/Praxissemester/script/required_signals.txt'
+        self.DBC_PATH = '/home/admin/Desktop/ETH_Gateway/assets/dbc/J1939_MAN_1.dbc'
+        self.SIGNALS_FILE = '/home/admin/Desktop/ETH_Gateway/assets/signals/required_signals.txt'
         self.CAN_CHANNEL = 'can0'
 
-        self.UDP_OUT_IP = "127.0.0.1"     # Zieladresse (anpassen!)
-        self.UDP_OUT_PORT = 5005          # Zielport
+        self.UDP_OUT_IP = "127.0.0.1"     
+        self.UDP_OUT_PORT = 5005          
         self.udp_sender_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     # CRC16 Algorithmus
@@ -169,6 +169,10 @@ class can_msg_sender():
         message_id = (self.SERVICE_ID_EGOMOTION << 16) | self.METHOD_ID
         someip_length = len(header_part2) + len(someip_payload)
         header_part1 = struct.pack("!II", message_id, someip_length)
+
+        # Debug Ausgabe der Signalnamen und Werte
+        for name, val in zip(signal_names, vdy_signal_parameters):
+            print(f" {name:30s}: {val:10.3f}")
 
         return header_part1 + header_part2 + someip_payload
 
