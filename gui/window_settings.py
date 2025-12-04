@@ -1,9 +1,9 @@
 """Fenstereinstellungen und Konstanten"""
 
 # Fenster-Einstellungen
-WINDOW_TITLE = "Signal State Dashboard"
-WINDOW_WIDTH = 1200
-WINDOW_HEIGHT = 475
+WINDOW_TITLE = "Vehicle Gateway Dashboard"
+WINDOW_WIDTH = 1300
+WINDOW_HEIGHT = 950
 
 # Schriftart
 FONT_PATH = '/home/admin/Desktop/ETH_Gateway/assets/fonts/AUMOVIOOffice-Regular.ttf'
