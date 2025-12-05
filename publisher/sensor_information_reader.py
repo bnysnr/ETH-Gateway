@@ -1,0 +1,1 @@
+# Script welches die UDP nachrichten auswertet und die gewünschten Sensorinformationen speichert

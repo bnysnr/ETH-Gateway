@@ -82,6 +82,10 @@ class Dashboard(QWidget):
             "egomotion_srr_fl": self.egomotion_box_srr_fl.table,
             "egomotion_srr_fr": self.egomotion_box_srr_fr.table,
         },
+        {
+            "sensor_information_srr_fl": self.sensor_information_table_srr_fl,
+            "sensor_information_srr_fr" : self.sensor_information_table_srr_fr,
+        },
         self.gui_font
         )
     

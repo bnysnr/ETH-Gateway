@@ -9,9 +9,10 @@ from .functions import create_table_item, get_status_description
 class DataBinding:
     """Verwaltet die Verbindung zwischen Daten und GUI-Elementen"""
     
-    def __init__(self, sensor_config_tables, egomotion_tables, gui_font):
+    def __init__(self, sensor_config_tables, egomotion_tables, sensor_information_table, gui_font):
         self.sensor_config_tables = sensor_config_tables   # dict
         self.egomotion_tables = egomotion_tables           # dict
+        self.sensor_information_table = sensor_information_table # dict
         self.gui_font = gui_font
     
     def update_signal_status_values(self, values):
@@ -63,3 +64,7 @@ class DataBinding:
                     is_status=False
                 )
                 table.setItem(i, 1, egomotion_value_item)
+
+    def update_signal_information_values(self, values):
+        pass
+        # Hier die Implementierung für die Echtzeitanzeige der Sensorinformationen anzeigen
