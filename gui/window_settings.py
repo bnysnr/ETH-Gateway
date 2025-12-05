@@ -2,7 +2,7 @@
 
 # Fenster-Einstellungen
 WINDOW_TITLE = "Vehicle Gateway Dashboard"
-WINDOW_WIDTH = 1300
+WINDOW_WIDTH = 2000     # 1300
 WINDOW_HEIGHT = 950
 
 # Schriftart
@@ -12,10 +12,6 @@ FONT_SIZE = 12
 # Bilder
 LOGO_PATH = "/home/admin/Desktop/ETH_Gateway/assets/image/Aumovio_Logo_orange_black_transparent.png"
 
-# Layout-Proportionen
-TITLE_BOX_HEIGHT_RATIO = 0.15
-CONTENT_BOX_HEIGHT_RATIO = 0.85
-BOX_SPACING = 10
 
 # Tabellen-Daten
 EGO_SIGNALS = [

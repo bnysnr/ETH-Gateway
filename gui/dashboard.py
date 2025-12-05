@@ -85,18 +85,18 @@ class Dashboard(QWidget):
         """Passt Spaltenbreiten bei Größenänderung an"""
         super().resizeEvent(event)
         
-        # Egomotion-Tabelle
+        # Egomotion-Tabelle (Spaltenverhältnisse)
         # SRR - FL
         ego_width = self.egomotion_box_srr_fl.table.viewport().width()
-        self.egomotion_box_srr_fl.table.setColumnWidth(0, int(ego_width * 0.7))
-        self.egomotion_box_srr_fl.table.setColumnWidth(1, int(ego_width * 0.3))
+        self.egomotion_box_srr_fl.table.setColumnWidth(0, int(ego_width * 0.6))
+        self.egomotion_box_srr_fl.table.setColumnWidth(1, int(ego_width * 0.4))
 
         # SRR - FR
-        self.egomotion_box_srr_fr.table.setColumnWidth(0, int(ego_width * 0.7))
-        self.egomotion_box_srr_fr.table.setColumnWidth(1, int(ego_width * 0.3))
+        self.egomotion_box_srr_fr.table.setColumnWidth(0, int(ego_width * 0.6))
+        self.egomotion_box_srr_fr.table.setColumnWidth(1, int(ego_width * 0.4))
         
 
-        # Signal Status Tabelle
+        # Signal Status Tabelle (Spaltenverhältnisse)
         # SRR - FL
         signal_status_width = self.signalstatus_box_srr_fl.table.viewport().width()
         self.signalstatus_box_srr_fl.table.setColumnWidth(0, int(signal_status_width * 0.4))

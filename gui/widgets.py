@@ -49,10 +49,10 @@ class Egomotion_SRR_FL(GenericEgomotionTable):
         )
 
     def _geometry(self, parent):
-        box_y = int(parent.height() * 0.1) + 10
-        box_h = int(parent.height() * 0.38)
-        box_w = int(parent.width() * 0.5)
-        return (10, box_y, box_w, box_h)
+        box_y = int(parent.height() * 0.1)          # Position auf der vertikalen Ebene
+        box_h = int(parent.height() * 0.38)         # Position auf der horizontalen Ebene 
+        box_w = int(parent.width() * 0.3)           # Boxbreite
+        return (10, box_y, box_w, box_h)            # Abstand zum linken Rand: 10
     
 class Egomotion_SRR_FR(GenericEgomotionTable):
     def __init__(self, parent, gui_font):
@@ -66,10 +66,10 @@ class Egomotion_SRR_FR(GenericEgomotionTable):
         )
 
     def _geometry(self, parent):
-        box_y = int(parent.height() * 0.1) + 10
-        box_h = int(parent.height() * 0.38)
-        box_w = int(parent.width() * 0.5)
-        return (10, box_y + 400, box_w, box_h)
+        box_y = int(parent.height() * 0.54)         # Position auf der vertikalen Ebene
+        box_h = int(parent.height() * 0.38)         # Position auf der horizontalen Ebene 
+        box_w = int(parent.width() * 0.3)           # Boxbreite
+        return (10, box_y, box_w, box_h)            
     
 """    
 class Egomotion_SRR_RL(GenericTable):
@@ -167,10 +167,10 @@ class SignalStatus_SRR_FL(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.5) + 20
-        y = int(parent.height() * 0.1) + 10
-        w = int(parent.width() * 0.45)
-        h = int(parent.height() * 0.38)
+        x = int(parent.width() * 0.35)                  # Position auf horizontaler Ebene
+        y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene 
+        w = int(parent.width() * 0.35)                  # Boxbreite
+        h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
 
@@ -187,11 +187,11 @@ class SignalStatus_SRR_FR(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.5) + 20
-        y = int(parent.height() * 0.1) + 10
-        w = int(parent.width() * 0.45)
-        h = int(parent.height() * 0.38)
-        return (x, y + 400, w, h)
+        x = int(parent.width() * 0.35)                  # Position auf horizontaler Ebene
+        y = int(parent.height() * 0.54)                   # Position auf vertikaler Ebene
+        w = int(parent.width() * 0.35)                  # Boxbreite
+        h = int(parent.height() * 0.38)                 # Boxhöhe
+        return (x, y, w, h)
     
 
 class Pointcloud_SRR_FL(PointcloudCheckbox):
