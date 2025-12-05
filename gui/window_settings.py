@@ -2,7 +2,7 @@
 
 # Fenster-Einstellungen
 WINDOW_TITLE = "Vehicle Gateway Dashboard"
-WINDOW_WIDTH = 2000     # 1300
+WINDOW_WIDTH = 1900     # 1300
 WINDOW_HEIGHT = 950
 
 # Schriftart
@@ -50,3 +50,11 @@ STATUS_DESCRIPTIONS = {
     15: "STATE INIT",
     255: "STATE MAX"
 }
+
+SENSOR_SIGNAL_INFORMATION = [
+    "Software Version",
+    "Sensor Operation Mode",
+    "Calibration",
+    "Blockage Status",
+    "Valid Detections"
+]

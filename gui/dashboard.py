@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtCore import Qt, pyqtSignal, QThread
 from .window_settings import WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT
 from .functions import load_custom_font, apply_font_to_table
-from .widgets import TitleBox, Egomotion_SRR_FL, Egomotion_SRR_FR, SignalStatus_SRR_FL, SignalStatus_SRR_FR, Pointcloud_SRR_FL, Pointcloud_SRR_FR
+from .widgets import TitleBox, Egomotion_SRR_FL, Egomotion_SRR_FR, SignalStatus_SRR_FL, SignalStatus_SRR_FR, Pointcloud_SRR_FL, Pointcloud_SRR_FR, SensorInformationTable_SRR_FL, SensorInformationTable_SRR_FR
 from .data_binding import DataBinding
 from publisher.radar_status_reader import radar_status_reader
 from publisher.can_msg_sender import can_msg_sender
@@ -66,7 +66,11 @@ class Dashboard(QWidget):
         self.checkbox_srr_fl = Pointcloud_SRR_FL(self, self.gui_font, self.signalstatus_box_srr_fl)
         self.checkbox_srr_fr = Pointcloud_SRR_FR(self, self.gui_font, self.signalstatus_box_srr_fr)
 
-    
+        # Sensorinformation Tabelle
+        self.sensor_information_table_srr_fl = SensorInformationTable_SRR_FL(self, self.gui_font)
+        self.sensor_information_table_srr_fr = SensorInformationTable_SRR_FR(self, self.gui_font)
+
+    # Data Bindiung für die Sensor Information Tabelle noch implementieren
     def _setup_data_binding(self):
         """Initialisiert das Daten-Binding"""
         self.data_binding = DataBinding(
@@ -107,6 +111,15 @@ class Dashboard(QWidget):
         self.signalstatus_box_srr_fr.table.setColumnWidth(0, int(signal_status_width * 0.4))
         self.signalstatus_box_srr_fr.table.setColumnWidth(1, int(signal_status_width * 0.2))
         self.signalstatus_box_srr_fr.table.setColumnWidth(2, int(signal_status_width * 0.4))
+
+        # Sensorinformation Tabelle (Spaltenverhätltnisse)
+        sensor_information_width = self.sensor_information_table_srr_fr.table.viewport().width()
+        self.sensor_information_table_srr_fl.table.setColumnWidth(0, int(sensor_information_width * 0.6))
+        self.sensor_information_table_srr_fl.table.setColumnWidth(1, int(sensor_information_width * 0.4))
+
+        self.sensor_information_table_srr_fr.table.setColumnWidth(0, int(sensor_information_width * 0.6))
+        self.sensor_information_table_srr_fr.table.setColumnWidth(1, int(sensor_information_width * 0.4))
+
                    
 
 
