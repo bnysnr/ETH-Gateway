@@ -35,7 +35,7 @@ def get_status_description(value):
     return STATUS_DESCRIPTIONS.get(value, "UNKNOWN")
 
 
-def create_table_item(text, font, status_value, is_status=False, ):
+def create_table_item(text, font, status_value, is_status=False):
     """Erstellt ein formatiertes Table-Item"""
     item = QTableWidgetItem(text)
     item.setFont(font)

@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtCore import Qt, pyqtSignal, QThread
 from .window_settings import WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT
 from .functions import load_custom_font, apply_font_to_table
-from .widgets import TitleBox, Egomotion_SRR_FL, Egomotion_SRR_FR, SignalStatus_SRR_FL, SignalStatus_SRR_FR, PointcloudCheckbox
+from .widgets import TitleBox, Egomotion_SRR_FL, Egomotion_SRR_FR, SignalStatus_SRR_FL, SignalStatus_SRR_FR, Pointcloud_SRR_FL, Pointcloud_SRR_FR
 from .data_binding import DataBinding
 from publisher.radar_status_reader import radar_status_reader
 from publisher.can_msg_sender import can_msg_sender
@@ -62,7 +62,10 @@ class Dashboard(QWidget):
         self.signalstatus_box_srr_fr = SignalStatus_SRR_FR(self, self.gui_font)
         
         # Pointcloud-Checkbox
-        self.checkbox = PointcloudCheckbox(self, self.gui_font, self.signalstatus_box_srr_fl)
+        # Pointcloud-Checkboxen korrekt erzeugen
+        self.checkbox_srr_fl = Pointcloud_SRR_FL(self, self.gui_font, self.signalstatus_box_srr_fl)
+        self.checkbox_srr_fr = Pointcloud_SRR_FR(self, self.gui_font, self.signalstatus_box_srr_fr)
+
     
     def _setup_data_binding(self):
         """Initialisiert das Daten-Binding"""

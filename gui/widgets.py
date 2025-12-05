@@ -8,6 +8,7 @@ from .window_settings import LOGO_PATH, EGO_SIGNALS, SENSOR_CONFIG_SIGNALS
 from .functions import apply_font_to_table, create_table_item
 from .generic_egomotion_table import GenericEgomotionTable
 from .generic_status_config_table import GenericSignalStatus
+from .generic_pointcloud_checkbox import PointcloudCheckbox
 
 
 class TitleBox(QFrame):
@@ -193,6 +194,38 @@ class SignalStatus_SRR_FR(GenericSignalStatus):
         return (x, y + 400, w, h)
     
 
+class Pointcloud_SRR_FL(PointcloudCheckbox):
+    def __init__(self, parent, gui_font, sensor_status_box):
+        super().__init__(
+            parent,
+            gui_font,
+            lambda parent: self._geometry(sensor_status_box)
+        )
+
+    def _geometry(self, sensor_status_box):
+        x = sensor_status_box.x() + 7
+        y = sensor_status_box.y() + sensor_status_box.height()
+        w = 250
+        h = 20
+        return (x, y, w, h)
+    
+
+class Pointcloud_SRR_FR(PointcloudCheckbox):
+    def __init__(self, parent, gui_font, sensor_status_box):
+        super().__init__(
+            parent,
+            gui_font,
+            lambda parent: self._geometry(sensor_status_box)
+        )
+
+    def _geometry(self, sensor_status_box):
+        x = sensor_status_box.x() + 7
+        y = sensor_status_box.y() + sensor_status_box.height() 
+        w = 250
+        h = 20
+        return (x, y, w, h)
+
+
 """    
 
 class SensorConfigBox(QFrame):
@@ -238,8 +271,10 @@ class SensorConfigBox(QFrame):
         self.table.setGeometry(10, 50, box_width - 20, box_height - 60)
 """
 
+""""
+
 class PointcloudCheckbox(QCheckBox):
-    """Checkbox für Pointcloud-Steuerung"""
+    #Checkbox für Pointcloud-Steuerung
     def __init__(self, parent, gui_font, sensor_config_box):
         super().__init__("Pointcloud deactivated", parent)
         self.setFont(gui_font)
@@ -257,3 +292,5 @@ class PointcloudCheckbox(QCheckBox):
             self.setText("Pointcloud activated")
         else:
             self.setText("Pointcloud deactivated")
+
+"""
