@@ -147,7 +147,7 @@ class Dashboard(QWidget):
     def update_radar_status_thread(self):
         """Thread für Radar-Status"""
         while self.thread_running:
-            arr = self.radar_obj.run()
+            arr = self.radar_obj.run('0007', 1231, 56)
             for radar_status in arr:
                 # Signal emitten
                 self.radar_status_updated.emit(radar_status)

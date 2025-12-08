@@ -26,7 +26,8 @@ class radar_status_reader():
 
                 
 
-    def run(self):
+    def run(self, service_id, bitposition, bitsize):
+        # Liefert den genauen Wert aus der UDP Nachricht und extrahiert diesen
         print(f"Listening on multicast {MCAST_GRP}:{UDP_PORT} ...")
         try:
             while True:
@@ -37,11 +38,17 @@ class radar_status_reader():
                 self.last_any_data = time.time()
 
                 raw = data.hex()
-                if not raw.startswith("0007"):
+                
+                if not raw.startswith(service_id):
                     continue
-                extracted = raw[322:336]
-                values = self.decode_values(extracted)
-                yield values
+                array_start_pos = round(bitposition / 8)
+                array_offset = bitposition % 8
+                array_length = bitsize // 8
+    
+                values = self.decode_values(raw)
+                start = array_start_pos + array_offset
+                end = start + array_length
+                yield values[start: end] 
 
         except Exception as e:
             print(f"Fehler im UDP Thread: {e}")
@@ -52,4 +59,5 @@ class radar_status_reader():
 
 if __name__ == "__main__":
     radar_status_reader_obj = radar_status_reader()
-    radar_status_reader_obj.run()
+   # for val in radar_status_reader_obj.run('0007', 1231, 56):
+   #     print(f"Ausgabe: {val}")
