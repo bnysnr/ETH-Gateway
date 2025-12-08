@@ -57,7 +57,3 @@ class radar_status_reader():
         return [hexstring[i:i+2] for i in range(0, len(hexstring), 2)]
 
 
-if __name__ == "__main__":
-    radar_status_reader_obj = radar_status_reader()
-   # for val in radar_status_reader_obj.run('0007', 1231, 56):
-   #     print(f"Ausgabe: {val}")

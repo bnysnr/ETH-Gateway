@@ -65,6 +65,16 @@ class DataBinding:
                 )
                 table.setItem(i, 1, egomotion_value_item)
 
-    def update_signal_information_values(self, values):
-        pass
-        # Hier die Implementierung für die Echtzeitanzeige der Sensorinformationen anzeigen
+    def update_sensor_information_values(self, values):
+        for key, table in self.sensor_information_table.items():
+            for index, value in enumerate(values):
+                    
+                # Status-Spalte
+                status_item = create_table_item(
+                    str(value), 
+                    self.gui_font, 
+                    status_value=str(value),
+                    is_status=True
+                    )
+                table.setItem(index, 1, status_item)
+        

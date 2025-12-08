@@ -19,6 +19,9 @@ def main():
     egomotion_thread = threading.Thread(target=dashboard.update_egomotion_value_thread)
     egomotion_thread.start()
 
+    radarsensor_information_thread = threading.Thread(target=dashboard.update_radar_signal_information_thread)
+    radarsensor_information_thread.start()
+
     sys.exit(app.exec_())
 
 

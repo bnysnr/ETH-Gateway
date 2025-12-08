@@ -27,37 +27,6 @@ class SensorInformationReader():
         mreq = struct.pack("4s4s", socket.inet_aton(MCAST_GRP), socket.inet_aton(INTERFACE_IP))
         self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-    """
-    
-    def extract_row_value(self, service_id, bitposition, bitsize):
-        # Liefert den genauen Wert aus der UDP Nachricht und extrahiert diesen
-        print(f"Listening on multicast {MCAST_GRP}:{UDP_PORT} ...")
-        try:
-            while True:
-                data, addr = self.sock.recvfrom(4096)
-                if addr[0] not in sensor_ips:
-                    continue
-
-                self.last_any_data = time.time()
-
-                raw = data.hex()
-                
-                if not raw.startswith(service_id):
-                    continue
-                print(raw)
-                array_start_pos = round(bitposition / 8)
-                array_offset = bitposition % 8
-                array_length = bitsize // 8
-    
-                values = self.decode_values(raw)
-                start = array_start_pos + array_offset
-                end = start + array_length
-                yield values[start: end + 1] 
-
-        except Exception as e:
-            print(f"Fehler im UDP Thread: {e}")
-
-    """
             
     
     def run(self, service_id, bitposition, bitsize):
@@ -92,9 +61,3 @@ class SensorInformationReader():
     def decode_values(self, hexstring):
         return [hexstring[i:i+2] for i in range(0, len(hexstring), 2)]
 
-
-if __name__ == "__main__":
-    sensor_information_reader_obj = SensorInformationReader()
-    for val in sensor_information_reader_obj.run('0007', 1231, 56):
-        print(f"Ausgabe: {val}")
- 
