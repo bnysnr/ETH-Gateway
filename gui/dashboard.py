@@ -124,11 +124,13 @@ class Dashboard(QWidget):
 
         # Sensorinformation Tabelle (Spaltenverhätltnisse)
         sensor_information_width = self.sensor_information_table_srr_fr.table.viewport().width()
-        self.sensor_information_table_srr_fl.table.setColumnWidth(0, int(sensor_information_width * 0.6))
-        self.sensor_information_table_srr_fl.table.setColumnWidth(1, int(sensor_information_width * 0.4))
+        self.sensor_information_table_srr_fl.table.setColumnWidth(0, int(sensor_information_width * 0.4))
+        self.sensor_information_table_srr_fl.table.setColumnWidth(1, int(sensor_information_width * 0.25))
+        self.sensor_information_table_srr_fl.table.setColumnWidth(2, int(sensor_information_width * 0.35))
 
-        self.sensor_information_table_srr_fr.table.setColumnWidth(0, int(sensor_information_width * 0.6))
-        self.sensor_information_table_srr_fr.table.setColumnWidth(1, int(sensor_information_width * 0.4))
+        self.sensor_information_table_srr_fr.table.setColumnWidth(0, int(sensor_information_width * 0.4))
+        self.sensor_information_table_srr_fr.table.setColumnWidth(1, int(sensor_information_width * 0.25))
+        self.sensor_information_table_srr_fr.table.setColumnWidth(2, int(sensor_information_width * 0.35))
 
                    
 

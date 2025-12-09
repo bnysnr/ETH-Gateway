@@ -85,7 +85,7 @@ class SignalStatus_SRR_FL(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.34)                  # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
         y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene 
         w = int(parent.width() * 0.35)                  # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
@@ -105,8 +105,8 @@ class SignalStatus_SRR_FR(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.34)                  # Position auf horizontaler Ebene
-        y = int(parent.height() * 0.54)                   # Position auf vertikaler Ebene
+        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
+        y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
         w = int(parent.width() * 0.35)                  # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
@@ -152,15 +152,15 @@ class SensorInformationTable_SRR_FL(GenericSignalStatus):
             gui_font,
             title="SRR FL - Sensor Information",
             row_labels=SENSOR_SIGNAL_INFORMATION,
-            columns=["Signalname", "Result"],
+            columns=["Signalname", "Result", "Description"],
             geometry_func=self._geometry
         )
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.72)                   # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.25)                   # Boxbreite
+        w = int(parent.width() * 0.33)                   # Boxbreite
         h = int(parent.height() * 0.32)                 # Boxhöhe
         return (x, y, w, h)
     
@@ -171,14 +171,14 @@ class SensorInformationTable_SRR_FR(GenericSignalStatus):
             gui_font,
             title="SRR FR - Sensor Information",
             row_labels=SENSOR_SIGNAL_INFORMATION,
-            columns=["Signalname", "Result"],
+            columns=["Signalname", "Result", "Description"],
             geometry_func=self._geometry
         )
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.72)                   # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.25)                 # Boxbreite
+        w = int(parent.width() * 0.33)                 # Boxbreite
         h = int(parent.height() * 0.32)                 # Boxhöhe
         return (x, y, w, h)
