@@ -67,9 +67,9 @@ STATUS_DESCRIPTIONS = {
 SENSOR_SIGNAL_INFORMATION = [
     "Software Version",
     "Sensor Operation Mode",
-    "Azimuth Misalignment",
+    "Azimuth Misalignment (rad)",
     "Blockage Status",
     "Valid Detections",
-    "Elevation Misalignment",
+    "Elevation Misalignment (rad)",
     "Calibration"
 ]

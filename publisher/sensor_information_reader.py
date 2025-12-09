@@ -31,7 +31,6 @@ class SensorInformationReader():
     
     def run(self, service_id, bitposition, bitsize):
         # Liefert den genauen Wert aus der UDP Nachricht und extrahiert diesen
-        print(f"Listening on multicast {MCAST_GRP}:{UDP_PORT} ...")
         try:
             while True:
                 data, addr = self.sock.recvfrom(4096)

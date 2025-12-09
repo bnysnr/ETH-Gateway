@@ -51,7 +51,6 @@ class DataBinding:
     def update_egomotion_values(self, values):
         """Update für Ego-Motion Tabellen (beide Seiten)."""
         ego_signal_units_arr = EGO_SIGNAL_UNITS
-        print(f"Ego Arr: {ego_signal_units_arr}")
         
 
         for key, table in self.egomotion_tables.items():

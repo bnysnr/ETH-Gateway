@@ -33,7 +33,8 @@ class Dashboard(QWidget):
         
         # GUI aufbauen
         self._create_widgets()
-        self._setup_data_binding()
+        self._setup_data_binding_srr_fl()
+        self._setup_data_binding_srr_fr()
         self.radar_obj = radar_status_reader()
         self.can_egomotion_obj = can_msg_sender() 
         self.sensor_information_obj = SensorInformationReader()
@@ -75,19 +76,34 @@ class Dashboard(QWidget):
         self.sensor_information_table_srr_fr = SensorInformationTable_SRR_FR(self, self.gui_font)
 
     # Data Bindiung für die Sensor Information Tabelle noch implementieren
-    def _setup_data_binding(self):
-        """Initialisiert das Daten-Binding"""
+    def _setup_data_binding_srr_fl(self):
+        """Initialisiert das Daten-Binding für den SRR FL"""
         self.data_binding = DataBinding(
         {
             "signal_status_srr_fl": self.signalstatus_box_srr_fl.table,
-            "signal_status_srr_fr": self.signalstatus_box_srr_fr.table,
+            #"signal_status_srr_fr": self.signalstatus_box_srr_fr.table,
         },
         {
             "egomotion_srr_fl": self.egomotion_box_srr_fl.table,
-            "egomotion_srr_fr": self.egomotion_box_srr_fr.table,
+            #"egomotion_srr_fr": self.egomotion_box_srr_fr.table,
         },
         {
             "sensor_information_srr_fl": self.sensor_information_table_srr_fl.table,
+            #"sensor_information_srr_fr" : self.sensor_information_table_srr_fr.table,
+        },
+        self.gui_font
+        )
+
+    def _setup_data_binding_srr_fr(self):
+        """Initialisiert das Daten-Binding für den SRR FL"""
+        self.data_binding = DataBinding(
+        {
+            "signal_status_srr_fr": self.signalstatus_box_srr_fr.table,
+        },
+        {
+            "egomotion_srr_fr": self.egomotion_box_srr_fr.table,
+        },
+        {
             "sensor_information_srr_fr" : self.sensor_information_table_srr_fr.table,
         },
         self.gui_font
@@ -199,7 +215,8 @@ class Dashboard(QWidget):
             ['0009', 191, 8],
             ['0001', 575, 16],
             ['0007', 1311, 8],
-            ['0001', 479, 16]
+            ['0001', 479, 16],
+            ['0001', 591, 16]
         ]
 
         while self.thread_running:
@@ -218,20 +235,17 @@ class Dashboard(QWidget):
                         signal = signal[0]
 
                     sensor_information_buffer_arr.append(signal)
-                    print(f"Sensor Info: {signal}")
 
                 except StopIteration:
                     # Generator hat keine Werte geliefert
                     sensor_information_buffer_arr.append(None)
-                    print(f"Sensor Info: None")
 
             # Ergebnisse nach 5 Signalen senden
             if self.sensor_information_updated:
                 sensor_information_buffer_arr[0] = self.switch_bit_position(sensor_information_buffer_arr[0])       # Bits werden umgedreht
                 sensor_information_buffer_arr[2] = self.switch_bit_position(sensor_information_buffer_arr[2])       # Bits werden umgedreht
                 self.sensor_information_updated.emit(sensor_information_buffer_arr)
-                print(f"Testausgabe (5 Signale): {sensor_information_buffer_arr}")
-
+                
             # Kurze Pause nach jedem kompletten Durchlauf
             time.sleep(0.2)
 

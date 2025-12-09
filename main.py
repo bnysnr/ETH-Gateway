@@ -13,11 +13,11 @@ def main():
 
     dashboard.show()
 
-    update_radar_status_val_thread = threading.Thread(target=dashboard.update_radar_status_thread)
-    update_radar_status_val_thread.start()
-
     egomotion_thread = threading.Thread(target=dashboard.update_egomotion_value_thread)
     egomotion_thread.start()
+
+    update_radar_status_val_thread = threading.Thread(target=dashboard.update_radar_status_thread)
+    update_radar_status_val_thread.start()
 
     radarsensor_information_thread = threading.Thread(target=dashboard.update_radar_signal_information_thread)
     radarsensor_information_thread.start()

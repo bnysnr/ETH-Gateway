@@ -161,7 +161,7 @@ class SensorInformationTable_SRR_FL(GenericSignalStatus):
         x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene
         w = int(parent.width() * 0.33)                   # Boxbreite
-        h = int(parent.height() * 0.32)                 # Boxhöhe
+        h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
 class SensorInformationTable_SRR_FR(GenericSignalStatus):
@@ -180,5 +180,5 @@ class SensorInformationTable_SRR_FR(GenericSignalStatus):
         x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
         w = int(parent.width() * 0.33)                 # Boxbreite
-        h = int(parent.height() * 0.32)                 # Boxhöhe
+        h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
