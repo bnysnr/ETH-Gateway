@@ -44,7 +44,7 @@ class Egomotion_SRR_FL(GenericEgomotionTable):
             gui_font,
             title="SRR FL - Egomotion",
             row_labels=EGO_SIGNALS,
-            columns=["Signalname", "Value"],
+            columns=["Signalname", "Unit", "Value"],
             geometry_func=self._geometry
         )
 
@@ -61,7 +61,7 @@ class Egomotion_SRR_FR(GenericEgomotionTable):
             gui_font,
             title="SRR FR - Egomotion",
             row_labels=EGO_SIGNALS,
-            columns=["Signalname", "Value"],
+            columns=["Signalname", "Unit", "Value"],
             geometry_func=self._geometry
         )
 
@@ -160,8 +160,8 @@ class SensorInformationTable_SRR_FL(GenericSignalStatus):
         # Position rechts neben Egomotion
         x = int(parent.width() * 0.72)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.25)                 # Boxbreite
-        h = int(parent.height() * 0.26)                 # Boxhöhe
+        w = int(parent.width() * 0.25)                   # Boxbreite
+        h = int(parent.height() * 0.32)                 # Boxhöhe
         return (x, y, w, h)
     
 class SensorInformationTable_SRR_FR(GenericSignalStatus):
@@ -180,5 +180,5 @@ class SensorInformationTable_SRR_FR(GenericSignalStatus):
         x = int(parent.width() * 0.72)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
         w = int(parent.width() * 0.25)                 # Boxbreite
-        h = int(parent.height() * 0.26)                 # Boxhöhe
+        h = int(parent.height() * 0.32)                 # Boxhöhe
         return (x, y, w, h)

@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from .functions import create_table_item, get_status_description
+from .window_settings import EGO_SIGNAL_UNITS
 
 
 class DataBinding:
@@ -49,6 +50,9 @@ class DataBinding:
 
     def update_egomotion_values(self, values):
         """Update für Ego-Motion Tabellen (beide Seiten)."""
+        ego_signal_units_arr = EGO_SIGNAL_UNITS
+        print(f"Ego Arr: {ego_signal_units_arr}")
+        
 
         for key, table in self.egomotion_tables.items():
             for i, val in enumerate(values):
@@ -57,13 +61,23 @@ class DataBinding:
 
                 formatted_val = f"{val:.4f}"
 
+                # Egomotion Item
                 egomotion_value_item = create_table_item(
                     formatted_val,
                     self.gui_font,
                     status_value=str(val),
                     is_status=False
                 )
-                table.setItem(i, 1, egomotion_value_item)
+                table.setItem(i, 2, egomotion_value_item)
+                
+                # Unit Item
+                unit_item = create_table_item(
+                    ego_signal_units_arr[i],
+                    self.gui_font,
+                    status_value=str(val),
+                    is_status=False
+                )
+                table.setItem(i, 1, unit_item)
 
     def update_sensor_information_values(self, values):
         for key, table in self.sensor_information_table.items():

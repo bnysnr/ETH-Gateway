@@ -26,6 +26,19 @@ EGO_SIGNALS = [
     "Vehicle Longitudinal Acceleration",
 ]
 
+# Egomotion Signaleinheiten
+EGO_SIGNAL_UNITS = [
+    "rad/s",
+    "rad",
+    "m/s²",
+    "m/s",
+    "m/s",
+    "m/s",
+    "m/s",
+    "m/s",
+    "m/s²"
+]
+
 SENSOR_CONFIG_SIGNALS = [
     "LongitudinalVelocity", 
     "LongitudinalAcceleration",
@@ -54,7 +67,9 @@ STATUS_DESCRIPTIONS = {
 SENSOR_SIGNAL_INFORMATION = [
     "Software Version",
     "Sensor Operation Mode",
-    "Calibration",
+    "Azimuth Misalignment",
     "Blockage Status",
-    "Valid Detections"
+    "Valid Detections",
+    "Elevation Misalignment",
+    "Calibration"
 ]

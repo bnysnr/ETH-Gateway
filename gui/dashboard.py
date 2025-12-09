@@ -100,12 +100,14 @@ class Dashboard(QWidget):
         # Egomotion-Tabelle (Spaltenverhältnisse)
         # SRR - FL
         ego_width = self.egomotion_box_srr_fl.table.viewport().width()
-        self.egomotion_box_srr_fl.table.setColumnWidth(0, int(ego_width * 0.6))
-        self.egomotion_box_srr_fl.table.setColumnWidth(1, int(ego_width * 0.4))
+        self.egomotion_box_srr_fl.table.setColumnWidth(0, int(ego_width * 0.55))
+        self.egomotion_box_srr_fl.table.setColumnWidth(1, int(ego_width * 0.15))
+        self.egomotion_box_srr_fl.table.setColumnWidth(2, int(ego_width * 0.3))
 
         # SRR - FR
-        self.egomotion_box_srr_fr.table.setColumnWidth(0, int(ego_width * 0.6))
-        self.egomotion_box_srr_fr.table.setColumnWidth(1, int(ego_width * 0.4))
+        self.egomotion_box_srr_fr.table.setColumnWidth(0, int(ego_width * 0.55))
+        self.egomotion_box_srr_fr.table.setColumnWidth(1, int(ego_width * 0.15))
+        self.egomotion_box_srr_fr.table.setColumnWidth(2, int(ego_width * 0.3))
         
 
         # Signal Status Tabelle (Spaltenverhältnisse)
