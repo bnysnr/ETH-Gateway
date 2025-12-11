@@ -68,8 +68,8 @@ SENSOR_SIGNAL_INFORMATION = [
     "Software Version",
     "Sensor Operation Mode",
     "Azimuth Misalignment (rad)",
+    "Elevation Misalignment (rad)",
     "Blockage Status",
     "Valid Detections",
-    "Elevation Misalignment (rad)",
     "Calibration"
 ]

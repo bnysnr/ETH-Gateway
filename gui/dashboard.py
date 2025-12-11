@@ -33,8 +33,8 @@ class Dashboard(QWidget):
         
         # GUI aufbauen
         self._create_widgets()
-        self._setup_data_binding_srr_fl()
-        self._setup_data_binding_srr_fr()
+        self._setup_data_binding_srr_fl()           # Tabelle mit zugehörigen Sensorwerten füllen
+        #self._setup_data_binding_srr_fr()
         self.radar_obj = radar_status_reader()
         self.can_egomotion_obj = can_msg_sender() 
         self.sensor_information_obj = SensorInformationReader()
@@ -206,17 +206,25 @@ class Dashboard(QWidget):
                 self.egomotion_values_updated.emit(list(latest_values))
                 last_update_time = current_time
 
+    def convert_hex_to_software_version_decimal(self, software_version_hex):
+        # Konvertiere jedes Element der Liste zu Dezimal und direkt zu String
+        converted = [str(int(h, 16)) for h in software_version_hex]
+
+        # Verbinde mit Punkten zu einer Version
+        return ".".join(converted)
+
+
 
     def update_radar_signal_information_thread(self):
         """Thread für Radar-Status"""
 
-        required_signal_data_arr = [
-            ['0007', 199, 32],
-            ['0009', 191, 8],
-            ['0001', 575, 16],
-            ['0007', 1311, 8],
-            ['0001', 479, 16],
-            ['0001', 591, 16]
+        required_signal_data_arr = [        # Aufbau: Service ID, Method ID, BitPosition, BitSize
+            ['0007', '1000', 199, 32],          # Software Version
+            ['0009', '1000', 191, 8],           # Sensor Operation Mode
+            ['0001', '1000', 575, 16],          # Azimuth Missalignment
+            ['0001', '1000', 591, 16],          # Elevation Missalignment
+            ['0007', '1000', 1311, 8],          # Blockage Status
+            ['0001', '1000', 479, 16],          # Valid Detections            
         ]
 
         while self.thread_running:
@@ -224,10 +232,10 @@ class Dashboard(QWidget):
             # Liste für aktuellen Durchlauf zurücksetzen
             sensor_information_buffer_arr = []
 
-            for service_id, bit_position, bit_size in required_signal_data_arr:
+            for service_id, method_id,  bit_position, bit_size in required_signal_data_arr:
 
                 # run liefert einen Generator
-                signal_generator = self.sensor_information_obj.run(service_id, bit_position, bit_size)
+                signal_generator = self.sensor_information_obj.run(service_id, method_id, bit_position, bit_size)
                 try:
                     signal = next(signal_generator)  # nur erstes Element nehmen
                     # Wenn Signal eine Liste mit 1 Element ist, direkt extrahieren
@@ -242,8 +250,14 @@ class Dashboard(QWidget):
 
             # Ergebnisse nach 5 Signalen senden
             if self.sensor_information_updated:
+                print(f"Roharray: {sensor_information_buffer_arr}")
                 sensor_information_buffer_arr[0] = self.switch_bit_position(sensor_information_buffer_arr[0])       # Bits werden umgedreht
-                sensor_information_buffer_arr[2] = self.switch_bit_position(sensor_information_buffer_arr[2])       # Bits werden umgedreht
+                sensor_information_buffer_arr[0] = self.convert_hex_to_software_version_decimal(sensor_information_buffer_arr[0])
+                sensor_information_buffer_arr[1] = int(sensor_information_buffer_arr[1])
+                print(f"Neue Softwareversion: {sensor_information_buffer_arr[0]}")
+                sensor_information_buffer_arr[2] = '.'.join(self.switch_bit_position(sensor_information_buffer_arr[2]))       # Bits werden umgedreht
+                sensor_information_buffer_arr[3] = '.'.join(self.switch_bit_position(sensor_information_buffer_arr[3]))  
+                sensor_information_buffer_arr[5] = (sensor_information_buffer_arr[5][0])
                 self.sensor_information_updated.emit(sensor_information_buffer_arr)
                 
             # Kurze Pause nach jedem kompletten Durchlauf

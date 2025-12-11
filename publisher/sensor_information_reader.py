@@ -29,7 +29,7 @@ class SensorInformationReader():
 
             
     
-    def run(self, service_id, bitposition, bitsize):
+    def run(self, service_id, method_id, bitposition, bitsize):
         # Liefert den genauen Wert aus der UDP Nachricht und extrahiert diesen
         try:
             while True:
@@ -41,16 +41,16 @@ class SensorInformationReader():
 
                 raw = data.hex()
                 
-                if not raw.startswith(service_id):
+                if not raw.startswith(service_id + method_id):
                     continue
-                array_start_pos = round(bitposition / 8)
-                array_offset = bitposition % 8
-                array_length = bitsize // 8
+                array_start_pos = round(bitposition / 8)                
+                array_offset = bitposition % 8                          
+                array_length = bitsize // 8                             
     
-                values = self.decode_values(raw)
-                start = array_start_pos + array_offset
-                end = start + array_length
-                yield values[start: end] 
+                values = self.decode_values(raw)                        
+                start = array_start_pos + array_offset                  
+                end = start + array_length                              
+                yield values[start: end]                                
 
         except Exception as e:
             print(f"Fehler im UDP Thread: {e}")
@@ -59,4 +59,9 @@ class SensorInformationReader():
 
     def decode_values(self, hexstring):
         return [hexstring[i:i+2] for i in range(0, len(hexstring), 2)]
-
+    
+if __name__ == "__main__":
+    obj = SensorInformationReader()
+    while True:
+        for i in obj.run('0001', '1000', 575, 16):
+            print(f"Ausgabe: {i}")

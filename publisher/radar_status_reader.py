@@ -57,3 +57,8 @@ class radar_status_reader():
         return [hexstring[i:i+2] for i in range(0, len(hexstring), 2)]
 
 
+if __name__ == "__main__":
+    radar_obj = radar_status_reader()
+    radar_obj.run()
+
+
