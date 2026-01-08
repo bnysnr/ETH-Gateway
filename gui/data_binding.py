@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from .functions import create_table_item, get_status_description
-from .window_settings import EGO_SIGNAL_UNITS
+from .window_settings import EGO_SIGNAL_UNITS, SENSOR_SIGNAL_INFORMATION, EGO_SIGNALS, SENSOR_CONFIG_SIGNALS
 
 
 class DataBinding:
@@ -31,7 +31,7 @@ class DataBinding:
             print(f"Keine Sensor-Config-Tabelle für '{sensor_id}'")
             return
 
-        table.setRowCount(len(values))  # dynamisch je nach Signalanzahl
+        table.setRowCount(len(SENSOR_CONFIG_SIGNALS))  
         for i, val in enumerate(values):
             # Status Item
             status_item = create_table_item(
@@ -55,8 +55,7 @@ class DataBinding:
             table.setItem(i, 2, desc_item)
 
     # ----------------------------
-    # Egomotion Werte (immer 9)
-    # ----------------------------
+    # Egomotion Werte 
     def update_egomotion_values(self, sensor_id: str, values: list):
         table = self.egomotion_tables.get(sensor_id)
         if table is None:
@@ -64,7 +63,7 @@ class DataBinding:
             return
 
         # Tabelle immer auf 9 Zeilen setzen
-        table.setRowCount(9)
+        table.setRowCount(len(EGO_SIGNALS))
 
         for i in range(9):
             val = values[i]
@@ -97,7 +96,7 @@ class DataBinding:
             print(f"Keine Sensor-Information-Tabelle für '{sensor_id}'")
             return
 
-        table.setRowCount(len(values))  # dynamisch je nach Anzahl
+        table.setRowCount(len(SENSOR_SIGNAL_INFORMATION)) 
         for index, value in enumerate(values):
             status_item = create_table_item(
                 str(value),

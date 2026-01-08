@@ -214,6 +214,7 @@ class Dashboard(QWidget):
                         value = None
 
                     buffer.append(value)
+                buffer.append(False)        # Defaultwert für Kalibrierung
 
                 # Signal emitten für den spezifischen Sensor
                 self.sensor_information_updated.emit(sensor_id, buffer)
