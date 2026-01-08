@@ -10,84 +10,99 @@ from .window_settings import EGO_SIGNAL_UNITS
 class DataBinding:
     """Verwaltet die Verbindung zwischen Daten und GUI-Elementen"""
     
-    def __init__(self, sensor_config_tables, egomotion_tables, sensor_information_table, gui_font):
-        self.sensor_config_tables = sensor_config_tables   # dict
-        self.egomotion_tables = egomotion_tables           # dict
-        self.sensor_information_table = sensor_information_table # dict
+    def __init__(
+        self,
+        sensor_config_tables: dict,
+        egomotion_tables: dict,
+        sensor_information_tables: dict,
+        gui_font
+    ):
+        self.sensor_config_tables = sensor_config_tables        # dict[str, QTableWidget]
+        self.egomotion_tables = egomotion_tables                # dict[str, QTableWidget]
+        self.sensor_information_tables = sensor_information_tables  # dict[str, QTableWidget]
         self.gui_font = gui_font
-    
-    def update_signal_status_values(self, values):
 
-        for key, table in self.sensor_config_tables.items():
-            # jede Tabelle durchlaufen
-            for i, val in enumerate(values):
-                if i >= table.rowCount():
-                    break
-                
-                # Status-Spalte
-                status_item = create_table_item(
-                    str(val), 
-                    self.gui_font, 
-                    status_value=str(val),
-                    is_status=True
-                )
-                table.setItem(i, 1, status_item)
+    # ----------------------------
+    # Signal Status Werte
+    # ----------------------------
+    def update_signal_status_values(self, sensor_id: str, values: list):
+        table = self.sensor_config_tables.get(sensor_id)
+        if table is None:
+            print(f"Keine Sensor-Config-Tabelle für '{sensor_id}'")
+            return
 
-                # Farbe
-                if int(val) != 0:
-                    status_item.setForeground(QColor('red'))
-                else:
-                    status_item.setForeground(QColor('green'))
-                
-                # Description
-                desc_val = int(val) if isinstance(val, (int, float, str)) else 0
-                desc_text = get_status_description(desc_val)
+        table.setRowCount(len(values))  # dynamisch je nach Signalanzahl
+        for i, val in enumerate(values):
+            # Status Item
+            status_item = create_table_item(
+                str(val),
+                self.gui_font,
+                status_value=str(val),
+                is_status=True
+            )
+            table.setItem(i, 1, status_item)
 
-                desc_item = QTableWidgetItem(desc_text)
-                desc_item.setFont(self.gui_font)
-                desc_item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                table.setItem(i, 2, desc_item)
+            # Farbe
+            status_item.setForeground(QColor('red') if int(val) != 0 else QColor('green'))
 
-    def update_egomotion_values(self, values):
-        """Update für Ego-Motion Tabellen (beide Seiten)."""
-        ego_signal_units_arr = EGO_SIGNAL_UNITS
-        
+            # Beschreibung
+            desc_val = int(val) if isinstance(val, (int, float, str)) else 0
+            desc_text = get_status_description(desc_val)
 
-        for key, table in self.egomotion_tables.items():
-            for i, val in enumerate(values):
-                if i >= table.rowCount():
-                    break
+            desc_item = QTableWidgetItem(desc_text)
+            desc_item.setFont(self.gui_font)
+            desc_item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            table.setItem(i, 2, desc_item)
 
-                formatted_val = f"{val:.4f}"
+    # ----------------------------
+    # Egomotion Werte (immer 9)
+    # ----------------------------
+    def update_egomotion_values(self, sensor_id: str, values: list):
+        table = self.egomotion_tables.get(sensor_id)
+        if table is None:
+            print(f"Keine Egomotion-Tabelle für '{sensor_id}'")
+            return
 
-                # Egomotion Item
-                egomotion_value_item = create_table_item(
-                    formatted_val,
-                    self.gui_font,
-                    status_value=str(val),
-                    is_status=False
-                )
-                table.setItem(i, 2, egomotion_value_item)
-                
-                # Unit Item
-                unit_item = create_table_item(
-                    ego_signal_units_arr[i],
-                    self.gui_font,
-                    status_value=str(val),
-                    is_status=False
-                )
-                table.setItem(i, 1, unit_item)
+        # Tabelle immer auf 9 Zeilen setzen
+        table.setRowCount(9)
 
-    def update_sensor_information_values(self, values):
-        for key, table in self.sensor_information_table.items():
-            for index, value in enumerate(values):
-                    
-                # Status-Spalte
-                status_item = create_table_item(
-                    str(value), 
-                    self.gui_font, 
-                    status_value=str(value),
-                    is_status=True
-                    )
-                table.setItem(index, 1, status_item)
-        
+        for i in range(9):
+            val = values[i]
+            formatted_val = f"{val:.4f}"
+
+            # Wert Item
+            value_item = create_table_item(
+                formatted_val,
+                self.gui_font,
+                status_value=str(val),
+                is_status=False
+            )
+            table.setItem(i, 2, value_item)
+
+            # Einheit Item
+            unit_item = create_table_item(
+                EGO_SIGNAL_UNITS[i],
+                self.gui_font,
+                status_value=EGO_SIGNAL_UNITS[i],
+                is_status=False
+            )
+            table.setItem(i, 1, unit_item)
+
+    # ----------------------------
+    # Sensorinformationen pro Sensor
+    # ----------------------------
+    def update_sensor_information_values(self, sensor_id: str, values: list):
+        table = self.sensor_information_tables.get(sensor_id)
+        if table is None:
+            print(f"Keine Sensor-Information-Tabelle für '{sensor_id}'")
+            return
+
+        table.setRowCount(len(values))  # dynamisch je nach Anzahl
+        for index, value in enumerate(values):
+            status_item = create_table_item(
+                str(value),
+                self.gui_font,
+                status_value=str(value),
+                is_status=True
+            )
+            table.setItem(index, 1, status_item)

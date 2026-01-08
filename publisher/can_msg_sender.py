@@ -26,6 +26,7 @@ class can_msg_sender():
     def __init__(self):
         super().__init__()
         self.vhc_can_val_arr = []
+        self.ip_addr_arr = []
         self.running = False
         self.radar_ips = []
         self.lock = threading.Lock() 
@@ -73,7 +74,7 @@ class can_msg_sender():
         return struct.unpack("<I", struct.pack("<f", value))[0]
 
     def capture_eth0(self):
-        ip_addr_arr = []
+        
         print("Start radar IP sniffing - Waiting for 3 seconds")
         try:
             capture = pyshark.LiveCapture(interface='eth0')
@@ -84,19 +85,22 @@ class can_msg_sender():
                 for packet in capture:
                     if 'IP' in packet:
                         src_ip = packet.ip.src
-                        if src_ip not in ip_addr_arr:
-                            ip_addr_arr.append(src_ip)
+                        if src_ip not in self.ip_addr_arr:
+                            self.ip_addr_arr.append(src_ip)
 
                 if time.time() - start_time >= 3:
                     break
 
-            print(f"Found IP addresses: {ip_addr_arr}")
-            return ip_addr_arr
+            print(f"Found IP addresses: {self.ip_addr_arr}")
+            return self.ip_addr_arr
 
         except KeyboardInterrupt:
             print("\nCapture finished")
         except Exception as e:
             print(f"Ein Fehler ist aufgetreten: {e}")
+
+    def get_founded_ip_addresses_arr(self):
+        return self.ip_addr_arr
 
     # -------------------- Initialisierung --------------------
     def load_dbc_and_signals(self):
