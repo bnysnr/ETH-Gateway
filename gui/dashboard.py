@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtCore import Qt, pyqtSignal
-from .window_settings import WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT
+from .window_settings import WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, EGOMOTION_DEFAULT_VALUES
 from .functions import load_custom_font
 from .widgets import (
     TitleBox,
@@ -17,6 +17,7 @@ from .data_binding import DataBinding
 from publisher.radar_status_reader import radar_status_reader
 from publisher.can_msg_sender import can_msg_sender
 from publisher.sensor_information_reader import SensorInformationReader
+from gui.available_sensors_checker import available_sensors
 import socket
 import struct
 import time
@@ -50,6 +51,10 @@ class Dashboard(QWidget):
         self.radar_obj = radar_status_reader()
         self.can_egomotion_obj = can_msg_sender()
         self.sensor_information_obj = SensorInformationReader()
+        self.available_sensors_checker_obj = available_sensors()
+        
+
+        self.available_sensors_checker_obj.start()
 
         # Netzwerk
         self.SOURCE_IP = "127.0.0.1"
@@ -143,7 +148,7 @@ class Dashboard(QWidget):
         if self.data_binding:
             self.data_binding.update_signal_status_values(sensor_id, values)
    
-    def update_egomotion_values(self, sensor_id: str, values: list):
+    def update_egomotion_values(self, sensor_id, values):
         if self.data_binding:
             self.data_binding.update_egomotion_values(sensor_id, values)
 
@@ -155,8 +160,8 @@ class Dashboard(QWidget):
     def update_radar_status_thread(self):
         while self.thread_running:
             for sensor_ip, values in self.radar_obj.run("0007", 1231, 56):
-                self.available_ip_addresses.append(sensor_ip)
-                print(f"[{sensor_ip}] Empfangene Werte: {values}")  
+                #self.available_ip_addresses.append(sensor_ip)
+              #  print(f"[{sensor_ip}] Empfangene Werte: {values}")  
                 self.radar_status_updated.emit(sensor_ip, values)  
             time.sleep(0.2)
 
@@ -171,14 +176,20 @@ class Dashboard(QWidget):
                 data, _ = self.sock.recvfrom(1024)
                 num_floats = len(data) // 4
                 latest_values = struct.unpack("<" + "f" * num_floats, data)
+                current_available_sensors = self.available_sensors_checker_obj.get_available()
+                not_available = self.available_sensors_checker_obj.get_not_available()
             except socket.timeout:
                 pass
 
             current_time = time.time()
             if latest_values and current_time - last_update_time >= 0.5:
-                for sensor_ip in self.available_ip_addresses:
+                for sensor_ip in current_available_sensors:
                     self.egomotion_values_updated.emit(sensor_ip, list(latest_values))
                     last_update_time = current_time
+
+                for not_available_sensor_ip in not_available:
+                    self.egomotion_values_updated.emit(not_available_sensor_ip, EGOMOTION_DEFAULT_VALUES)
+                   
 
     def update_radar_signal_information_thread(self, ip_addresses_arr):
         required_signal_data_arr = [

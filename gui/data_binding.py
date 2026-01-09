@@ -66,8 +66,20 @@ class DataBinding:
         table.setRowCount(len(EGO_SIGNALS))
 
         for i in range(len(EGO_SIGNALS)):
-            val = values[i]
-            formatted_val = f"{val:.4f}"
+            # Prüfe ob Index existiert
+            if i >= len(values):
+                val = None
+            else:
+                val = values[i]
+            
+            # Formatiere Wert oder zeige "None"
+            if val == 'None' or val is None:
+                formatted_val = "None"
+            else:
+                try:
+                    formatted_val = f"{float(val):.4f}"
+                except (ValueError, TypeError):
+                    formatted_val = "None"
 
             # Wert Item
             value_item = create_table_item(

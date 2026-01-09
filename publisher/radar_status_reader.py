@@ -101,5 +101,5 @@ if __name__ == "__main__":
     radar_obj = radar_status_reader()
     
     # Generator konsumieren und Daten verarbeiten
-    for sensor_ip, values in radar_obj.run("0007", 1231, 56):
-        print(f"[{sensor_ip}] Empfangene Werte: {values}")
+  #  for sensor_ip, values in radar_obj.run("0007", 1231, 56):
+  #      print(f"[{sensor_ip}] Empfangene Werte: {values}")
