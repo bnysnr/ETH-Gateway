@@ -22,6 +22,8 @@ import struct
 import time
 
 
+
+
 class Dashboard(QWidget):
     """Hauptfenster des Dashboards"""
 
@@ -133,6 +135,9 @@ class Dashboard(QWidget):
         super().showEvent(event)
         self.resizeEvent(None)
 
+    # Funktion zum prüfen der aktuell verfügbaren Sensoren
+    def check_available_sensors(self):
+        pass
   
     def update_signal_status_values(self, sensor_id: str, values: list):
         if self.data_binding:

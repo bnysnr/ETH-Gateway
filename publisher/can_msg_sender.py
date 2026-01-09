@@ -88,7 +88,7 @@ class can_msg_sender():
                         if src_ip not in self.ip_addr_arr:
                             self.ip_addr_arr.append(src_ip)
 
-                if time.time() - start_time >= 3:
+                if time.time() - start_time >= 2:
                     break
 
             print(f"Found IP addresses: {self.ip_addr_arr}")
