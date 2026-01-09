@@ -64,17 +64,12 @@ class Dashboard(QWidget):
 
         # Mapping IP -> Sensor
         self.IP_TO_SENSOR = {
-         #   "192.168.16.11": "ars_front",
-            "192.168.16.12": "srr_fl",
-            "192.168.16.13": "srr_fr",
-         #   "192.168.16.14": "srr_rl",
-         #  "192.168.16.15": "srr_rr",
-         #   "192.168.16.16": "ars_rear"
+            "srr_fl": "192.168.16.12",
+            "srr_fr": "192.168.16.13"
         }
 
-    # ----------------------------
-    # GUI Erstellung
-    # ----------------------------
+        self.available_ip_addresses = []
+
     def _create_widgets(self):
         self.title_box = TitleBox(self, self.gui_font)
 
@@ -94,29 +89,25 @@ class Dashboard(QWidget):
         self.sensor_information_table_srr_fl = SensorInformationTable_SRR_FL(self, self.gui_font)
         self.sensor_information_table_srr_fr = SensorInformationTable_SRR_FR(self, self.gui_font)
 
-    # ----------------------------
-    # DataBinding Setup
-    # ----------------------------
+   
     def _setup_data_binding(self):
         self.data_binding = DataBinding(
             sensor_config_tables={
-                "srr_fl": self.signalstatus_box_srr_fl.table,
-                "srr_fr": self.signalstatus_box_srr_fr.table,
+                "192.168.16.12": self.signalstatus_box_srr_fl.table,
+                "192.168.16.13": self.signalstatus_box_srr_fr.table,
             },
             egomotion_tables={
-                "srr_fl": self.egomotion_box_srr_fl.table,
-                "srr_fr": self.egomotion_box_srr_fr.table,
+                "192.168.16.12": self.egomotion_box_srr_fl.table,
+                "192.168.16.13": self.egomotion_box_srr_fr.table,
             },
             sensor_information_tables={
-                "srr_fl": self.sensor_information_table_srr_fl.table,
-                "srr_fr": self.sensor_information_table_srr_fr.table,
+                "192.168.16.12": self.sensor_information_table_srr_fl.table,
+                "192.168.16.13": self.sensor_information_table_srr_fr.table,
             },
             gui_font=self.gui_font,
         )
 
-    # ----------------------------
-    # Resize Event
-    # ----------------------------
+
     def resizeEvent(self, event):
         super().resizeEvent(event)
 
@@ -142,13 +133,11 @@ class Dashboard(QWidget):
         super().showEvent(event)
         self.resizeEvent(None)
 
-    # ----------------------------
-    # Update Funktionen
-    # ----------------------------
+  
     def update_signal_status_values(self, sensor_id: str, values: list):
         if self.data_binding:
             self.data_binding.update_signal_status_values(sensor_id, values)
-
+   
     def update_egomotion_values(self, sensor_id: str, values: list):
         if self.data_binding:
             self.data_binding.update_egomotion_values(sensor_id, values)
@@ -157,14 +146,13 @@ class Dashboard(QWidget):
         if self.data_binding:
             self.data_binding.update_sensor_information_values(sensor_id, values)
 
-    # ----------------------------
-    # Threads
-    # ----------------------------
+    
     def update_radar_status_thread(self):
         while self.thread_running:
-            arr = self.radar_obj.run("0007", 1231, 56)
-            for radar_status in arr:
-                self.radar_status_updated.emit("srr_fl", radar_status)  # Beispiel: srr_fl
+            for sensor_ip, values in self.radar_obj.run("0007", 1231, 56):
+                self.available_ip_addresses.append(sensor_ip)
+                print(f"[{sensor_ip}] Empfangene Werte: {values}")  
+                self.radar_status_updated.emit(sensor_ip, values)  
             time.sleep(0.2)
 
     def update_egomotion_value_thread(self):
@@ -183,8 +171,9 @@ class Dashboard(QWidget):
 
             current_time = time.time()
             if latest_values and current_time - last_update_time >= 0.5:
-                self.egomotion_values_updated.emit("srr_fl", list(latest_values))
-                last_update_time = current_time
+                for sensor_ip in self.available_ip_addresses:
+                    self.egomotion_values_updated.emit(sensor_ip, list(latest_values))
+                    last_update_time = current_time
 
     def update_radar_signal_information_thread(self, ip_addresses_arr):
         required_signal_data_arr = [
@@ -222,9 +211,7 @@ class Dashboard(QWidget):
 
             time.sleep(0.2)
 
-    # ----------------------------
-    # Close Event
-    # ----------------------------
+  
     def closeEvent(self, event):
         self.thread_running = False
         try:

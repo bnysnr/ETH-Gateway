@@ -73,3 +73,23 @@ SENSOR_SIGNAL_INFORMATION = [
     "Valid Detections",
     "Calibration"
 ]
+
+EGOMOTION_DEFAULT_VALUES = [
+    "None",
+    "None",
+    "None",
+    "None",
+    "None",
+    "None",
+    "None"
+]
+
+RADAR_STATUS_DEFAULT_VALUES = [
+    "02",
+    "02",
+    "02",
+    "00",
+    "02",
+    "02",
+    "02"
+]

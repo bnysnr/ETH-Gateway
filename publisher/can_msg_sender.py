@@ -216,8 +216,8 @@ class can_msg_sender():
                         value = decoded[signal_name]
                         vdy_signal_parameters[idx] = value
                         updated = True
-                        print(f"Signalname: {signal_name} - Signalwert: {value}")
-                print("*" * 30)
+                       # print(f"Signalname: {signal_name} - Signalwert: {value}")
+                #print("*" * 30)
 
                 if not updated:
                     continue

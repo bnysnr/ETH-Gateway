@@ -65,7 +65,7 @@ class DataBinding:
         # Tabelle immer auf 9 Zeilen setzen
         table.setRowCount(len(EGO_SIGNALS))
 
-        for i in range(9):
+        for i in range(len(EGO_SIGNALS)):
             val = values[i]
             formatted_val = f"{val:.4f}"
 
