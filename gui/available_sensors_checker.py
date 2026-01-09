@@ -11,6 +11,7 @@ INTERFACE_IP = '192.168.16.5'
 class available_sensors():
     def __init__(self):
         self.sensors = {}
+        self.available_ips = []
 
     def listen(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -30,21 +31,25 @@ class available_sensors():
 
     def check_available(self):
         while True:
-            time.sleep(2)
+            time.sleep(0.1)
             now = time.time()
-            available = [ip for ip in ALLOWED_IPS if (now - self.sensors.get(ip, 0)) < 1]
-            print(f"Verfügbar: {', '.join(available) or 'Keine'}")
+            available = sorted([ip for ip in ALLOWED_IPS if (now - self.sensors.get(ip, 0)) < 1])
+            
+            if available != self.available_ips:
+                self.available_ips = available
+
+    def get_available(self):
+        return self.available_ips
 
     def start(self):
         threading.Thread(target=self.listen, daemon=True).start()
         threading.Thread(target=self.check_available, daemon=True).start()
-        
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print("Beendet")
 
 if __name__ == "__main__":
     sensor_obj = available_sensors()
     sensor_obj.start()
+    
+    while True:
+        ips = sensor_obj.get_available()
+        print(f"IPS: {ips}")
+        time.sleep(0.5)
