@@ -3,7 +3,7 @@ import struct
 import time
 import threading
 
-ALLOWED_IPS = {"192.168.16.15", "192.168.16.12", "192.168.16.13"}
+ALLOWED_IPS = {"192.168.16.12", "192.168.16.13", "192.168.16.14", "192.168.16.15", "192.168.16.16"}
 MCAST_GRP = '239.22.0.3'
 UDP_PORT = 40000
 INTERFACE_IP = '192.168.16.5'
