@@ -72,7 +72,7 @@ SENSOR_SIGNAL_INFORMATION = [
     "Blockage Status",
     "Valid Detections",
     "Calibration",
-    "Connection"
+    "Connection to Vehicle"
 ]
 
 EGOMOTION_DEFAULT_VALUES = [
@@ -96,6 +96,7 @@ RADAR_STATUS_DEFAULT_VALUES = [
 ]
 
 SIGNALE_INFORMATION_NOT_CONNECTED = [
+    "NO CONNECTION",
     "NO CONNECTION",
     "NO CONNECTION",
     "NO CONNECTION",

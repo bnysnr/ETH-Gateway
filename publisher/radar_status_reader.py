@@ -15,7 +15,6 @@ SENSOR_TIMEOUT = 1  # Sekunden ohne Daten = Fehler
 class radar_status_reader():
     def __init__(self):
         super().__init__()
-       # self.active_sensors = defaultdict(lambda: {"last_seen": 0, "warned": False})
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -30,25 +29,15 @@ class radar_status_reader():
         print(f"Listening on multicast {MCAST_GRP}:{UDP_PORT} ...")
         print(f"Überwache nur folgende IP-Adressen: {available_sensor_ip_arr}")
         
-        # Initialisiere alle Sensoren mit last_seen
-       # for ip in available_sensor_ip_arr:
-       #     self.active_sensors[ip]["last_seen"] = time.time()
         
         try:
             while True:
                 try:
                     data, addr = self.sock.recvfrom(4096)
                 except socket.timeout:
-                    # Überprüfe inaktive Sensoren und gebe Default-Werte zurück
-                 #   for result in self.check_inactive_sensors():
-                 #       yield result
                     continue
                 
                 sensor_ip = addr[0]
-
-               # self.active_sensors[sensor_ip]["last_seen"] = time.time()
-               # self.active_sensors[sensor_ip]["warned"] = False  # Reset warning flag
-
                 raw = data.hex()
                 
                 if not raw.startswith(service_id):

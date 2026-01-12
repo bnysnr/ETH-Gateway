@@ -270,15 +270,25 @@ class Dashboard(QWidget):
                                 print(f"Error reading {sensor_ip}: {e}")
                                 buffer.append(None)
                     
-                    buffer.append(False)  # Defaultwert für Kalibrierung
+                    # Abfrage für die Sensorkalibrierung
+                    if((buffer[1]) == 3 and buffer[2] is not None):
+                        buffer.append(True) # Index 6: Kalibrierung
+                        print("Sensor ist kalibriert")
+                    else:    
+                        buffer.append(False) # Index 6: Kalibrierung
+                        print("Sensor ist nicht kalibriert")
 
                     # Signal emitten für den spezifischen Sensor (IP-basiert)
+                    self.format_sensor_information_arr(buffer)
+                    buffer.append("Connected") # Index 7: Connection
                     self.sensor_information_updated.emit(sensor_ip, buffer)
                     print(f"{sensor_ip}: {buffer}")
+                    
 
                 # Nicht verfügbare Sensoren mit Default-Werten verarbeiten
                 for not_available_sensor_ip in not_available:
                     self.sensor_information_updated.emit(not_available_sensor_ip, SIGNALE_INFORMATION_NOT_CONNECTED)
+                    
 
                 time.sleep(0.2)
 
@@ -287,6 +297,13 @@ class Dashboard(QWidget):
                 import traceback
                 traceback.print_exc()
                 time.sleep(1)
+
+    def format_sensor_information_arr(self, arr):
+        arr[1] = int(arr[1])
+        arr[5] = arr[5][0]
+        arr[2] = arr[2][::-1]
+        arr[3] = arr[3][::-1]
+        return arr
 
     def _fetch_sensor_value(self, sensor_ip, service_id, method_id, bit_pos, bit_size):
         """Hilfsfunktion für parallele Sensor-Abfragen"""
@@ -299,6 +316,10 @@ class Dashboard(QWidget):
                 bit_size
             )
             value = next(gen)
+
+            if isinstance(value, list):
+                value = value[0] if len(value) == 1 else value
+
             return value
         except StopIteration:
             print(f"No response from {sensor_ip} - Service: {service_id}")
