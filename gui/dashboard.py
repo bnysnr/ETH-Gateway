@@ -21,6 +21,7 @@ from gui.available_sensors_checker import available_sensors
 import socket
 import struct
 import time
+import concurrent.futures
 
 
 
@@ -219,6 +220,8 @@ class Dashboard(QWidget):
                    
 
                 
+    
+
     def update_radar_signal_information_thread(self):
         required_signal_data_arr = [
             ["0007", "1000", 199, 32],
@@ -240,27 +243,32 @@ class Dashboard(QWidget):
                 for sensor_ip in current_available_sensors:
                     buffer = []
 
-                    # Für jeden Signal-Datensatz ein Paket vom Sensor abrufen
-                    for service_id, method_id, bit_pos, bit_size in required_signal_data_arr:
-                        try:
-                            # Generator für EINZELNEN Sensor mit den spezifischen Parametern
-                            gen = self.sensor_information_obj.run(
-                                sensor_ip,  # Einzelne IP als String
+                    # Alle 6 Anfragen PARALLEL ausführen
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
+                        futures = []
+                        
+                        for service_id, method_id, bit_pos, bit_size in required_signal_data_arr:
+                            future = executor.submit(
+                                self._fetch_sensor_value, 
+                                sensor_ip, 
                                 service_id, 
                                 method_id, 
                                 bit_pos, 
                                 bit_size
                             )
-                            value = next(gen)  # Nur einen Wert abrufen
-                            
-                            # Wert korrekt verarbeiten
-                            if isinstance(value, list):
-                                value = value[0] if len(value) == 1 else value
-                        except (StopIteration, socket.timeout, Exception) as e:
-                            print(f"Error reading from {sensor_ip} - Service: {service_id}, Method: {method_id}: {e}")
-                            value = None
-
-                        buffer.append(value)
+                            futures.append(future)
+                        
+                        # Ergebnisse in der gleichen Reihenfolge sammeln
+                        for future in futures:
+                            try:
+                                value = future.result(timeout=2.5)
+                                buffer.append(value)
+                            except concurrent.futures.TimeoutError:
+                                print(f"Timeout for {sensor_ip}")
+                                buffer.append(None)
+                            except Exception as e:
+                                print(f"Error reading {sensor_ip}: {e}")
+                                buffer.append(None)
                     
                     buffer.append(False)  # Defaultwert für Kalibrierung
 
@@ -270,9 +278,7 @@ class Dashboard(QWidget):
 
                 # Nicht verfügbare Sensoren mit Default-Werten verarbeiten
                 for not_available_sensor_ip in not_available:
-                    
                     self.sensor_information_updated.emit(not_available_sensor_ip, SIGNALE_INFORMATION_NOT_CONNECTED)
-                    #print(f"{not_available_sensor_ip}: NOT AVAILABLE - {SIGNALE_INFORMATION_NOT_CONNECTED}")
 
                 time.sleep(0.2)
 
@@ -281,6 +287,25 @@ class Dashboard(QWidget):
                 import traceback
                 traceback.print_exc()
                 time.sleep(1)
+
+    def _fetch_sensor_value(self, sensor_ip, service_id, method_id, bit_pos, bit_size):
+        """Hilfsfunktion für parallele Sensor-Abfragen"""
+        try:
+            gen = self.sensor_information_obj.run(
+                sensor_ip,
+                service_id, 
+                method_id, 
+                bit_pos, 
+                bit_size
+            )
+            value = next(gen)
+            return value
+        except StopIteration:
+            print(f"No response from {sensor_ip} - Service: {service_id}")
+            return None
+        except Exception as e:
+            print(f"Error reading from {sensor_ip} - Service: {service_id}, Method: {method_id}: {e}")
+            return None
 
   
     def closeEvent(self, event):

@@ -10,7 +10,7 @@ MCAST_GRP = '239.22.0.3'
 UDP_PORT = 40000
 INTERFACE_IP = '192.168.16.5'
 
-SENSOR_TIMEOUT = 2  # Sekunden ohne Daten = Fehler
+SENSOR_TIMEOUT = 2  # 2 Sekunden ohne Daten = Fehler
 
 
 class SensorInformationReader():
@@ -21,7 +21,7 @@ class SensorInformationReader():
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind(('0.0.0.0', UDP_PORT))
-        self.sock.settimeout(SENSOR_TIMEOUT)  # Timeout setzen!
+        self.sock.settimeout(SENSOR_TIMEOUT) 
 
         mreq = struct.pack("4s4s", socket.inet_aton(MCAST_GRP), socket.inet_aton(INTERFACE_IP))
         self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
@@ -34,10 +34,6 @@ class SensorInformationReader():
             while True:
                 try:
                     data, addr = self.sock.recvfrom(4096)
-                    
-                    # Nur Pakete vom gewünschten Sensor akzeptieren
-                    #if addr[0] != sensor_ip_adress:
-                    #    continue
 
                     self.last_any_data = time.time()
 
