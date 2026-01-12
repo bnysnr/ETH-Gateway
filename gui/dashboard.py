@@ -281,6 +281,7 @@ class Dashboard(QWidget):
                     # Signal emitten für den spezifischen Sensor (IP-basiert)
                     self.format_sensor_information_arr(buffer)
                     buffer.append("Connected") # Index 7: Connection
+                    buffer[7]
                     self.sensor_information_updated.emit(sensor_ip, buffer)
                     print(f"{sensor_ip}: {buffer}")
                     

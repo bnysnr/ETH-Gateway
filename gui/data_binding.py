@@ -117,3 +117,7 @@ class DataBinding:
                 is_status=True
             )
             table.setItem(index, 1, status_item)
+
+            # Farbe für Kalibrierung
+            if index == 7:
+                status_item.setForeground(QColor('green') if str(value) == "Connected" else QColor('red'))
