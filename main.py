@@ -25,7 +25,7 @@ def main():
     update_radar_status_val_thread = threading.Thread(target=dashboard.update_radar_status_thread)
     update_radar_status_val_thread.start()
 
-    radarsensor_information_thread = threading.Thread(target=dashboard.update_radar_signal_information_thread, args=(can_msg_sender_obj.ip_addr_arr, ))
+    radarsensor_information_thread = threading.Thread(target=dashboard.update_radar_signal_information_thread)
     radarsensor_information_thread.start()
 
     sys.exit(app.exec_())

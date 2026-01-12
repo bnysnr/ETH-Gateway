@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtCore import Qt, pyqtSignal
-from .window_settings import WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, EGOMOTION_DEFAULT_VALUES, RADAR_STATUS_DEFAULT_VALUES
+from .window_settings import WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, EGOMOTION_DEFAULT_VALUES, RADAR_STATUS_DEFAULT_VALUES, SIGNALE_INFORMATION_NOT_CONNECTED
 from .functions import load_custom_font
 from .widgets import (
     TitleBox,
@@ -163,7 +163,7 @@ class Dashboard(QWidget):
                 current_available_sensors = self.available_sensors_checker_obj.get_available()
                 not_available = self.available_sensors_checker_obj.get_not_available()
 
-                print(f"Available: {current_available_sensors} - Not available: {not_available}")
+             #   print(f"Available: {current_available_sensors} - Not available: {not_available}")
 
                 # Jeden verfügbaren Sensor EINZELN verarbeiten (nicht alle auf einmal)
                 for sensor_ip in current_available_sensors:
@@ -171,7 +171,7 @@ class Dashboard(QWidget):
                         gen = self.radar_obj.run([sensor_ip], "0007", 1231, 56)  # Nur EINEN Sensor!
                         response_ip, values = next(gen)
                         self.radar_status_updated.emit(response_ip, values)
-                        print(f"AVAILABLE SENSORS: {response_ip} - {values}")
+            #            print(f"AVAILABLE SENSORS: {response_ip} - {values}")
                     except StopIteration:
                         print(f"No response from {sensor_ip}")
                     except Exception as e:
@@ -180,7 +180,7 @@ class Dashboard(QWidget):
                 # Nicht verfügbare Sensoren verarbeiten
                 for not_available_sensor_ip in not_available:
                     self.radar_status_updated.emit(not_available_sensor_ip, RADAR_STATUS_DEFAULT_VALUES)
-                    print(f"NOT AVAILABLE SENSORS: {not_available_sensor_ip} - {RADAR_STATUS_DEFAULT_VALUES}")
+           #         print(f"NOT AVAILABLE SENSORS: {not_available_sensor_ip} - {RADAR_STATUS_DEFAULT_VALUES}")
 
                 time.sleep(0.2)
 
@@ -218,7 +218,8 @@ class Dashboard(QWidget):
                     self.egomotion_values_updated.emit(not_available_sensor_ip, EGOMOTION_DEFAULT_VALUES)
                    
 
-    def update_radar_signal_information_thread(self, ip_addresses_arr):
+                
+    def update_radar_signal_information_thread(self):
         required_signal_data_arr = [
             ["0007", "1000", 199, 32],
             ["0009", "1000", 191, 8],
@@ -229,31 +230,57 @@ class Dashboard(QWidget):
         ]
 
         while self.thread_running:
-            for ip_address in ip_addresses_arr:
-                sensor_id = self.IP_TO_SENSOR.get(ip_address)
-                if not sensor_id:
-                    continue
+            try:
+                current_available_sensors = self.available_sensors_checker_obj.get_available()
+                not_available = self.available_sensors_checker_obj.get_not_available()
 
-                buffer = []
-                
+                print(f"Ausgabe: {current_available_sensors} - {not_available}")
 
-                for service_id, method_id, bit_pos, bit_size in required_signal_data_arr:
-                    gen = self.sensor_information_obj.run(service_id, method_id, bit_pos, bit_size)
-                    try:
-                        value = next(gen)
-                        if isinstance(value, list) and len(value) == 1:
-                            value = value[0]
-                    except StopIteration:
-                        value = None
+                # Jeden verfügbaren Sensor EINZELN verarbeiten
+                for sensor_ip in current_available_sensors:
+                    buffer = []
 
-                    buffer.append(value)
-                buffer.append(False)        # Defaultwert für Kalibrierung
+                    # Für jeden Signal-Datensatz ein Paket vom Sensor abrufen
+                    for service_id, method_id, bit_pos, bit_size in required_signal_data_arr:
+                        try:
+                            # Generator für EINZELNEN Sensor mit den spezifischen Parametern
+                            gen = self.sensor_information_obj.run(
+                                sensor_ip,  # Einzelne IP als String
+                                service_id, 
+                                method_id, 
+                                bit_pos, 
+                                bit_size
+                            )
+                            value = next(gen)  # Nur einen Wert abrufen
+                            
+                            # Wert korrekt verarbeiten
+                            if isinstance(value, list):
+                                value = value[0] if len(value) == 1 else value
+                        except (StopIteration, socket.timeout, Exception) as e:
+                            print(f"Error reading from {sensor_ip} - Service: {service_id}, Method: {method_id}: {e}")
+                            value = None
 
-                # Signal emitten für den spezifischen Sensor
-                self.sensor_information_updated.emit(sensor_id, buffer)
-                print(f"{sensor_id}: {buffer}")
+                        buffer.append(value)
+                    
+                    buffer.append(False)  # Defaultwert für Kalibrierung
 
-            time.sleep(0.2)
+                    # Signal emitten für den spezifischen Sensor (IP-basiert)
+                    self.sensor_information_updated.emit(sensor_ip, buffer)
+                    print(f"{sensor_ip}: {buffer}")
+
+                # Nicht verfügbare Sensoren mit Default-Werten verarbeiten
+                for not_available_sensor_ip in not_available:
+                    
+                    self.sensor_information_updated.emit(not_available_sensor_ip, SIGNALE_INFORMATION_NOT_CONNECTED)
+                    #print(f"{not_available_sensor_ip}: NOT AVAILABLE - {SIGNALE_INFORMATION_NOT_CONNECTED}")
+
+                time.sleep(0.2)
+
+            except Exception as e:
+                print(f"SENSOR INFORMATION THREAD ERROR: {e}")
+                import traceback
+                traceback.print_exc()
+                time.sleep(1)
 
   
     def closeEvent(self, event):
