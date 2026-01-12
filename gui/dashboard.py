@@ -281,7 +281,6 @@ class Dashboard(QWidget):
                     # Signal emitten für den spezifischen Sensor (IP-basiert)
                     self.format_sensor_information_arr(buffer)
                     buffer.append("Connected") # Index 7: Connection
-                    buffer[7]
                     self.sensor_information_updated.emit(sensor_ip, buffer)
                     print(f"{sensor_ip}: {buffer}")
                     
@@ -299,6 +298,7 @@ class Dashboard(QWidget):
                 traceback.print_exc()
                 time.sleep(1)
 
+    # Hilfsfunktion zur besseren Anzeige der Sensorinformationen
     def format_sensor_information_arr(self, arr):
         arr[0] = arr[0][::-1] # Bytes umdrehen
         software_version_number = [int(x, 16) for x in arr[0]]  # Umwandlung von Hex in Int
@@ -310,6 +310,8 @@ class Dashboard(QWidget):
         arr[2] = ' '.join(str(x) for x in arr[2])
         arr[3] = arr[3][::-1]
         arr[3] = ' '.join(str(x) for x in arr[3])
+        arr[4] = ' '.join(str(arr[4]))
+        print(arr[4])
         return arr
 
     def _fetch_sensor_value(self, sensor_ip, service_id, method_id, bit_pos, bit_size):

@@ -3,12 +3,12 @@
 from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
-from .functions import create_table_item, get_status_description
-from .window_settings import EGO_SIGNAL_UNITS, SENSOR_SIGNAL_INFORMATION, EGO_SIGNALS, SENSOR_CONFIG_SIGNALS
+from .functions import create_table_item, get_signal_status_description, get_sensor_operation_mode_description, get_blockage_state_description, get_blockage_state_selftest_description
+from .window_settings import EGO_SIGNAL_UNITS, SENSOR_SIGNAL_INFORMATION, EGO_SIGNALS, SENSOR_CONFIG_SIGNALS, SENSOR_OPERATION_MODE, BLOCKAGE_STATE, BLOCKAGE_STATE_SELFTEST
 
 
 class DataBinding:
-    """Verwaltet die Verbindung zwischen Daten und GUI-Elementen"""
+    # Schnittstelle zwischen Daten und GUI-Elementen
     
     def __init__(
         self,
@@ -22,9 +22,8 @@ class DataBinding:
         self.sensor_information_tables = sensor_information_tables  # dict[str, QTableWidget]
         self.gui_font = gui_font
 
-    # ----------------------------
+
     # Signal Status Werte
-    # ----------------------------
     def update_signal_status_values(self, sensor_id: str, values: list):
         table = self.sensor_config_tables.get(sensor_id)
         if table is None:
@@ -47,14 +46,14 @@ class DataBinding:
 
             # Beschreibung
             desc_val = int(val) if isinstance(val, (int, float, str)) else 0
-            desc_text = get_status_description(desc_val)
+            desc_text = get_signal_status_description(desc_val)
 
             desc_item = QTableWidgetItem(desc_text)
             desc_item.setFont(self.gui_font)
             desc_item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             table.setItem(i, 2, desc_item)
 
-    # ----------------------------
+
     # Egomotion Werte 
     def update_egomotion_values(self, sensor_id: str, values: list):
         table = self.egomotion_tables.get(sensor_id)
@@ -99,9 +98,8 @@ class DataBinding:
             )
             table.setItem(i, 1, unit_item)
 
-    # ----------------------------
+
     # Sensorinformationen pro Sensor
-    # ----------------------------
     def update_sensor_information_values(self, sensor_id: str, values: list):
         table = self.sensor_information_tables.get(sensor_id)
         if table is None:
@@ -116,6 +114,41 @@ class DataBinding:
                 status_value=str(value),
                 is_status=True
             )
+            
+            # Beschreibung für die Sensorinformation - Statuswert abhängig 
+            if(index == 1):
+                table.setItem(index, 2, create_table_item(
+                    str(SENSOR_OPERATION_MODE[value]),
+                    self.gui_font,
+                    status_value=str(value),
+                    is_status=False
+                ))
+            """
+            if(index == 2):
+                table.setItem(index, 2, create_table_item(
+                    str(SENSOR_OPERATION_MODE[value]),
+                    self.gui_font,
+                    status_value=str(value),
+                    is_status=False
+                ))
+
+            if(index == 3):
+                table.setItem(index, 2, create_table_item(
+                    str(SENSOR_OPERATION_MODE[value]),
+                    self.gui_font,
+                    status_value=str(value),
+                    is_status=False
+                ))
+            """
+            if index == 4:
+                parts = value.split()  
+                table.setItem(index, 2, create_table_item(
+                    str(BLOCKAGE_STATE_SELFTEST[int(parts[0])]) + " " + str(BLOCKAGE_STATE[int(parts[1])]),
+                    self.gui_font,
+                    status_value=str(value),
+                    is_status=False
+                ))
+            
             table.setItem(index, 1, status_item)
 
             # Farbe für Kalibrierung

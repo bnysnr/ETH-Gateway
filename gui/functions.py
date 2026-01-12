@@ -4,7 +4,7 @@
 from PyQt5.QtGui import QFontDatabase, QFont, QColor, QBrush
 from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
-from .window_settings import FONT_PATH, FONT_SIZE, STATUS_DESCRIPTIONS
+from .window_settings import FONT_PATH, FONT_SIZE, STATUS_DESCRIPTIONS, SENSOR_OPERATION_MODE, BLOCKAGE_STATE, BLOCKAGE_STATE_SELFTEST
 
 
 def load_custom_font():
@@ -30,9 +30,19 @@ def apply_font_to_table(table, font):
                 item.setFont(font)
 
 
-def get_status_description(value):
+def get_signal_status_description(value):
     """Gibt die Beschreibung für einen Status-Wert zurück"""
     return STATUS_DESCRIPTIONS.get(value, "UNKNOWN")
+
+def get_sensor_operation_mode_description(value):
+    """Gibt die Beschreibung der Sensorinformationen zurück"""
+    return SENSOR_OPERATION_MODE.get(value, "UNKNOWN")
+
+def get_blockage_state_description(value):
+    return BLOCKAGE_STATE.get(value, "UNKNNOWN")
+
+def get_blockage_state_selftest_description(value):
+    return BLOCKAGE_STATE_SELFTEST.get(value, "UNKNOWN")
 
 
 def create_table_item(text, font, status_value, is_status=False):
