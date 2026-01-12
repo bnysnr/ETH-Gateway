@@ -71,7 +71,8 @@ SENSOR_SIGNAL_INFORMATION = [
     "Elevation Misalignment (rad)",
     "Blockage Status",
     "Valid Detections",
-    "Calibration"
+    "Calibration",
+    "Connection"
 ]
 
 EGOMOTION_DEFAULT_VALUES = [
@@ -103,3 +104,24 @@ SIGNALE_INFORMATION_NOT_CONNECTED = [
     "NO CONNECTION",
     "NO CONNECTION"
 ]
+
+SENSOR_OPERATION_MODE = {
+    3: "NORMAL",
+    8: "AIA MODE",
+    9: "NO EMISSION"
+}
+
+BLOCKAGE_STATE = {
+    0: "BLIND",
+    1: "BLOCKAGE HIGH",
+    2: "BLOCKAGE MID",
+    3: "BLOCKAGE LOW",
+    4: "NO BLOCKAGE"
+
+}
+
+BLOCKAGE_STATE_SELFTEST = {
+    0: "SELFTEST FAILED",
+    1: "SEFTTEST SUCCESS",
+    2: "SELFTEST ONGOING"
+}
