@@ -24,8 +24,6 @@ import time
 import concurrent.futures
 
 
-
-
 class Dashboard(QWidget):
     """Hauptfenster des Dashboards"""
 
@@ -300,9 +298,9 @@ class Dashboard(QWidget):
 
     # Hilfsfunktion zur besseren Anzeige der Sensorinformationen
     def format_sensor_information_arr(self, arr):
-        arr[0] = arr[0][::-1] # Bytes umdrehen
+        arr[0] = arr[0][::-1]  # Bytes umdrehen
         software_version_number = [int(x, 16) for x in arr[0]]  # Umwandlung von Hex in Int
-        software_version_final = '.'.join(str(x) for x in software_version_number) # Formattierung als Softwareversion mit .
+        software_version_final = '.'.join(str(x) for x in software_version_number)  # Formattierung als Softwareversion mit .
         arr[0] = software_version_final
         arr[1] = int(arr[1])
         arr[5] = arr[5][0]
@@ -312,7 +310,6 @@ class Dashboard(QWidget):
         arr[3] = ' '.join(str(x) for x in arr[3])
         arr[4] = ' '.join(str(arr[4]))
         print(arr[4])
-        return arr
 
     def _fetch_sensor_value(self, sensor_ip, service_id, method_id, bit_pos, bit_size):
         """Hilfsfunktion für parallele Sensor-Abfragen"""

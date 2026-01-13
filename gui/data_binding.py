@@ -6,6 +6,9 @@ from PyQt5.QtGui import QColor
 from .functions import create_table_item, get_signal_status_description, get_sensor_operation_mode_description, get_blockage_state_description, get_blockage_state_selftest_description
 from .window_settings import EGO_SIGNAL_UNITS, SENSOR_SIGNAL_INFORMATION, EGO_SIGNALS, SENSOR_CONFIG_SIGNALS, SENSOR_OPERATION_MODE, BLOCKAGE_STATE, BLOCKAGE_STATE_SELFTEST
 
+AZIMUTH_ELEVATION_RESOLUTION = 0.0000063935301747158
+AZIMUTH_ELEVATION_OFFSET = -0.21
+
 
 class DataBinding:
     # Schnittstelle zwischen Daten und GUI-Elementen
@@ -98,64 +101,113 @@ class DataBinding:
             )
             table.setItem(i, 1, unit_item)
 
-    """
-    # Sensorinformationen pro Sensor
-    def update_sensor_information_values(self, sensor_id: str, values: list):
-        table = self.sensor_information_tables.get(sensor_id)
-        if table is None:
-            print(f"Keine Sensor-Information-Tabelle für '{sensor_id}'")
-            return
 
-        table.setRowCount(len(SENSOR_SIGNAL_INFORMATION)) 
-        for index, value in enumerate(values):
-            status_item = create_table_item(
-                str(value),
-                self.gui_font,
-                status_value=str(value),
-                is_status=True
-            )
+    def format_sensor_information_arr(self, arr):
+        """Formatiert Sensor-Informations-Array mit Fehlerbehandlung"""
+        try:
+            # Index 0: Software Version
+            if arr[0] is not None:
+                arr[0] = arr[0][::-1]  # Bytes umdrehen
+                software_version_number = [int(x, 16) for x in arr[0]]
+                software_version_final = '.'.join(str(x) for x in software_version_number)
+                arr[0] = software_version_final
+            else:
+                arr[0] = "UNKNOWN"
             
-            # Beschreibung für die Sensorinformation - Statuswert abhängig 
-            if(index == 1):
-                table.setItem(index, 2, create_table_item(
-                    str(SENSOR_OPERATION_MODE[value]),
-                    self.gui_font,
-                    status_value=str(value),
-                    is_status=False
-                ))
+            # Index 1: Operation Mode
+            if arr[1] is not None:
+                arr[1] = int(arr[1])
+            else:
+                arr[1] = "UNKNOWN"
             
-            if(index == 2):
-                table.setItem(index, 2, create_table_item(
-                    str(SENSOR_OPERATION_MODE[value]),
-                    self.gui_font,
-                    status_value=str(value),
-                    is_status=False
-                ))
+            # Index 2: Azimuth (Hex-Wert)
+            if arr[2] is not None and isinstance(arr[2], str):
+                arr[2] = arr[2][::-1]
+                arr[2] = ' '.join(str(x) for x in arr[2])
+            else:
+                arr[2] = "UNKNOWN"
+            
+            # Index 3: Elevation (Hex-Wert)
+            if arr[3] is not None and isinstance(arr[3], str):
+                arr[3] = arr[3][::-1]
+                arr[3] = ' '.join(str(x) for x in arr[3])
+            else:
+                arr[3] = "UNKNOWN"
+            
+            # Index 4: Blockage State
+            if arr[4] is not None:
+                arr[4] = ' '.join(str(arr[4]))
+            else:
+                arr[4] = "UNKNOWN"
+            
+            # Index 5: Sicherer Zugriff auf Element
+            if arr[5] is not None and len(arr[5]) > 0:
+                arr[5] = arr[5][0]
+            else:
+                arr[5] = "UNKNOWN"
+            
+            print(f"Formatierte Sensor Info: {arr}")
+            
+        except (IndexError, TypeError, ValueError) as e:
+            print(f"Fehler beim Formatieren der Sensor-Information: {e}")
+            # Setze alle auf UNKNOWN bei Fehler
+            for i in range(len(arr)):
+                arr[i] = "UNKNOWN"
 
-            if(index == 3):
-                table.setItem(index, 2, create_table_item(
-                    str(SENSOR_OPERATION_MODE[value]),
-                    self.gui_font,
-                    status_value=str(value),
-                    is_status=False
-                ))
-            
-            if index == 4:
-                parts = value.split()  
-                table.setItem(index, 2, create_table_item(
-                    str(BLOCKAGE_STATE_SELFTEST[int(parts[0])]) + " " + str(BLOCKAGE_STATE[int(parts[1])]),
-                    self.gui_font,
-                    status_value=str(value),
-                    is_status=False
-                ))
-            
-            table.setItem(index, 1, status_item)
 
-            # Farbe für Kalibrierung
-            if index == 7:
-                status_item.setForeground(QColor('green') if str(value) == "Connected" else QColor('red'))
+    def format_sensor_information_arr(self, arr):
+        """Formatiert Sensor-Informations-Array mit Fehlerbehandlung"""
+        try:
+            # Index 0: Software Version
+            if arr[0] is not None:
+                arr[0] = arr[0][::-1]  # Bytes umdrehen
+                software_version_number = [int(x, 16) for x in arr[0]]
+                software_version_final = '.'.join(str(x) for x in software_version_number)
+                arr[0] = software_version_final
+            else:
+                arr[0] = "UNKNOWN"
+            
+            # Index 1: Operation Mode
+            if arr[1] is not None:
+                arr[1] = int(arr[1])
+            else:
+                arr[1] = "UNKNOWN"
+            
+            # Index 2: Azimuth (Hex-Wert)
+            if arr[2] is not None and isinstance(arr[2], str):
+                arr[2] = arr[2][::-1]
+                arr[2] = ' '.join(str(x) for x in arr[2])
+            else:
+                arr[2] = "UNKNOWN"
+            
+            # Index 3: Elevation (Hex-Wert)
+            if arr[3] is not None and isinstance(arr[3], str):
+                arr[3] = arr[3][::-1]
+                arr[3] = ' '.join(str(x) for x in arr[3])
+            else:
+                arr[3] = "UNKNOWN"
+            
+            # Index 4: Blockage State
+            if arr[4] is not None:
+                arr[4] = ' '.join(str(arr[4]))
+            else:
+                arr[4] = "UNKNOWN"
+            
+            # Index 5: Sicherer Zugriff auf Element
+            if arr[5] is not None and len(arr[5]) > 0:
+                arr[5] = arr[5][0]
+            else:
+                arr[5] = "UNKNOWN"
+            
+            print(f"Formatierte Sensor Info: {arr}")
+            
+        except (IndexError, TypeError, ValueError) as e:
+            print(f"Fehler beim Formatieren der Sensor-Information: {e}")
+            # Setze alle auf UNKNOWN bei Fehler
+            for i in range(len(arr)):
+                arr[i] = "UNKNOWN"
 
-    """    
+
     def update_sensor_information_values(self, sensor_id: str, values: list):
         table = self.sensor_information_tables.get(sensor_id)
         if table is None:
@@ -180,9 +232,32 @@ class DataBinding:
                     status_value=str(value) if value is not None else "UNKNOWN",
                     is_status=False
                 ))
+
+            elif index == 2:
+                # Azimuth: Hex zu Float mit Berechnung
+                final_int_val, is_valid = self._safe_hex_to_float(value, AZIMUTH_ELEVATION_RESOLUTION, AZIMUTH_ELEVATION_OFFSET)
+                display_val = str(f"{final_int_val:.10f}") if is_valid else "UNKNOWN"
+                table.setItem(index, 2, create_table_item(
+                    display_val,
+                    self.gui_font,
+                    status_value=display_val,
+                    is_status=True
+                ))
+
+            elif index == 3:
+                # Elevation: Hex zu Float mit Berechnung
+                final_int_val, is_valid = self._safe_hex_to_float(value, AZIMUTH_ELEVATION_RESOLUTION, AZIMUTH_ELEVATION_OFFSET)
+                display_val = str(f"{final_int_val:.10f}") if is_valid else "UNKNOWN"
+                table.setItem(index, 2, create_table_item(
+                    display_val,
+                    self.gui_font,
+                    status_value=display_val,
+                    is_status=True
+                ))
                 
-            if index == 4:
-                if value is not None:
+            elif index == 4:
+                # Blockage State
+                if value is not None and value != "UNKNOWN":
                     parts = str(value).split()
                     if len(parts) >= 2:
                         try:
@@ -202,7 +277,7 @@ class DataBinding:
                     status_value=str(value) if value is not None else "UNKNOWN",
                     is_status=False
                 ))
-                
+            
             table.setItem(index, 1, status_item)
 
             # Farbe für Kalibrierung
@@ -219,3 +294,25 @@ class DataBinding:
             return str(value) if value is not None else default
         except (TypeError, AttributeError, ValueError):
             return default
+
+
+    def _safe_hex_to_float(self, value, resolution, offset) -> tuple:
+        """Konvertiert Hex-String zu Float mit Berechnung
+        Returniert (float_value, is_valid_bool)"""
+        try:
+            if value is None or value == "UNKNOWN":
+                return 0.0, False
+            
+            # Entferne Leerzeichen aus Hex-String
+            hex_value = str(value).replace(" ", "")
+            
+            # Prüfe ob es gültiges Hex ist
+            if not all(c in '0123456789abcdefABCDEF' for c in hex_value):
+                return 0.0, False
+            
+            hex_to_int_val = int(hex_value, 16)
+            final_val = (hex_to_int_val * resolution) + offset
+            return final_val, True
+            
+        except (ValueError, TypeError, AttributeError):
+            return 0.0, False
