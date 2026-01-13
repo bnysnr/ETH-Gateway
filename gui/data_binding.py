@@ -98,7 +98,7 @@ class DataBinding:
             )
             table.setItem(i, 1, unit_item)
 
-
+    """
     # Sensorinformationen pro Sensor
     def update_sensor_information_values(self, sensor_id: str, values: list):
         table = self.sensor_information_tables.get(sensor_id)
@@ -123,7 +123,7 @@ class DataBinding:
                     status_value=str(value),
                     is_status=False
                 ))
-            """
+            
             if(index == 2):
                 table.setItem(index, 2, create_table_item(
                     str(SENSOR_OPERATION_MODE[value]),
@@ -139,7 +139,7 @@ class DataBinding:
                     status_value=str(value),
                     is_status=False
                 ))
-            """
+            
             if index == 4:
                 parts = value.split()  
                 table.setItem(index, 2, create_table_item(
@@ -154,3 +154,68 @@ class DataBinding:
             # Farbe für Kalibrierung
             if index == 7:
                 status_item.setForeground(QColor('green') if str(value) == "Connected" else QColor('red'))
+
+    """    
+    def update_sensor_information_values(self, sensor_id: str, values: list):
+        table = self.sensor_information_tables.get(sensor_id)
+        if table is None:
+            print(f"Keine Sensor-Information-Tabelle für '{sensor_id}'")
+            return
+
+        table.setRowCount(len(SENSOR_SIGNAL_INFORMATION)) 
+        for index, value in enumerate(values):
+            status_item = create_table_item(
+                str(value) if value is not None else "UNKNOWN",
+                self.gui_font,
+                status_value=str(value) if value is not None else "UNKNOWN",
+                is_status=True
+            )
+                
+            # Beschreibung für die Sensorinformation - Statuswert abhängig 
+            if index == 1:
+                description = self._safe_dict_lookup(SENSOR_OPERATION_MODE, value, "UNKNOWN")
+                table.setItem(index, 2, create_table_item(
+                    description,
+                    self.gui_font,
+                    status_value=str(value) if value is not None else "UNKNOWN",
+                    is_status=False
+                ))
+                
+            if index == 4:
+                if value is not None:
+                    parts = str(value).split()
+                    if len(parts) >= 2:
+                        try:
+                            desc1 = self._safe_dict_lookup(BLOCKAGE_STATE_SELFTEST, int(parts[0]), "UNKNOWN")
+                            desc2 = self._safe_dict_lookup(BLOCKAGE_STATE, int(parts[1]), "UNKNOWN")
+                            description = f"{desc1} {desc2}"
+                        except (ValueError, IndexError):
+                            description = "UNKNOWN"
+                    else:
+                        description = "UNKNOWN"
+                else:
+                    description = "UNKNOWN"
+                    
+                table.setItem(index, 2, create_table_item(
+                    description,
+                    self.gui_font,
+                    status_value=str(value) if value is not None else "UNKNOWN",
+                    is_status=False
+                ))
+                
+            table.setItem(index, 1, status_item)
+
+            # Farbe für Kalibrierung
+            if index == 7:
+                status_item.setForeground(QColor('green') if str(value) == "Connected" else QColor('red'))
+
+
+    def _safe_dict_lookup(self, dictionary: dict, key, default: str = "UNKNOWN") -> str:
+        """Sicherer Zugriff auf Dictionary mit Default-Wert"""
+        try:
+            if key is None:
+                return default
+            value = dictionary.get(key, default)
+            return str(value) if value is not None else default
+        except (TypeError, AttributeError, ValueError):
+            return default
