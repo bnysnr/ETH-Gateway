@@ -182,3 +182,5 @@ class SensorInformationTable_SRR_FR(GenericSignalStatus):
         w = int(parent.width() * 0.33)                 # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
+    
+

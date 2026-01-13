@@ -146,7 +146,6 @@ class DataBinding:
             else:
                 arr[5] = "UNKNOWN"
             
-            print(f"Formatierte Sensor Info: {arr}")
             
         except (IndexError, TypeError, ValueError) as e:
             print(f"Fehler beim Formatieren der Sensor-Information: {e}")
@@ -199,7 +198,6 @@ class DataBinding:
             else:
                 arr[5] = "UNKNOWN"
             
-            print(f"Formatierte Sensor Info: {arr}")
             
         except (IndexError, TypeError, ValueError) as e:
             print(f"Fehler beim Formatieren der Sensor-Information: {e}")
