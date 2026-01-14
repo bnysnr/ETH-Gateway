@@ -60,14 +60,3 @@ class radar_status_reader():
 
     def decode_values(self, hexstring):
         return [hexstring[i:i+2] for i in range(0, len(hexstring), 2)]
-
-"""
-if __name__ == "__main__":
-    radar_obj = radar_status_reader()
-    available_arr = ["192.168.16.12", "192.168.16.13"]
-    
-    # Generator konsumieren und Daten verarbeiten
-    for sensor_ip, values in radar_obj.run(available_arr, "0007", 1231, 56):
-        print(f"[{sensor_ip}] Empfangene Werte: {values}")
-        time.sleep(0.2)
-"""

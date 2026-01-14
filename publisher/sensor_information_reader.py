@@ -67,3 +67,4 @@ class SensorInformationReader():
 
     def decode_values(self, hexstring):
         return [hexstring[i:i+2] for i in range(0, len(hexstring), 2)]
+    

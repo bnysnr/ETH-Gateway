@@ -165,10 +165,10 @@ class Dashboard(QWidget):
                 # Jeden verfügbaren Sensor EINZELN verarbeiten (nicht alle auf einmal)
                 for sensor_ip in current_available_sensors:
                     try:
-                        gen = self.radar_obj.run([sensor_ip], "0007", 1231, 56)  # Nur EINEN Sensor!
+                        gen = self.radar_obj.run([sensor_ip], "0007", 1231, 56) 
                         response_ip, values = next(gen)
                         self.radar_status_updated.emit(response_ip, values)
-            #            print(f"AVAILABLE SENSORS: {response_ip} - {values}")
+
                     except StopIteration:
                         print(f"No response from {sensor_ip}")
                     except Exception as e:
@@ -214,17 +214,14 @@ class Dashboard(QWidget):
                     self.egomotion_values_updated.emit(not_available_sensor_ip, EGOMOTION_DEFAULT_VALUES)
                    
 
-                
-    
-
     def update_radar_signal_information_thread(self):
         required_signal_data_arr = [
-            ["0007", "1000", 199, 32],
-            ["0009", "1000", 191, 8],
-            ["0001", "1000", 575, 16],
-            ["0001", "1000", 591, 16],
-            ["0007", "1000", 1311, 8],
-            ["0001", "1000", 479, 16],
+            ["0007", "1000", 199, 32],      # Software Version
+            ["0009", "1000", 191, 8],       # Sensor Operation Mode
+            ["0001", "1000", 575, 16],      # Azimuth Misalignment
+            ["0001", "1000", 591, 16],      # Elevation Misalignment
+            ["0007", "1000", 1311, 8],      # Blockage Status
+            ["0001", "1000", 479, 16],      # Valid Detections
         ]
 
         while self.thread_running:
@@ -232,53 +229,31 @@ class Dashboard(QWidget):
                 current_available_sensors = self.available_sensors_checker_obj.get_available()
                 not_available = self.available_sensors_checker_obj.get_not_available()
 
-                #print(f"Ausgabe in Sensor Information: {current_available_sensors} - {not_available}")
-
                 # Jeden verfügbaren Sensor EINZELN verarbeiten
                 for sensor_ip in current_available_sensors:
                     buffer = []
 
-                    # Alle 6 Anfragen PARALLEL ausführen
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
-                        futures = []
-                        
-                        for service_id, method_id, bit_pos, bit_size in required_signal_data_arr:
-                            future = executor.submit(
-                                self._fetch_sensor_value, 
-                                sensor_ip, 
-                                service_id, 
-                                method_id, 
-                                bit_pos, 
-                                bit_size
-                            )
-                            futures.append(future)
-                        
-                        # Ergebnisse in der gleichen Reihenfolge sammeln
-                        for future in futures:
-                            try:
-                                value = future.result(timeout=2.5)
-                                buffer.append(value)
-                            except concurrent.futures.TimeoutError:
-                                print(f"Timeout for {sensor_ip}")
-                                buffer.append(None)
-                            except Exception as e:
-                                print(f"Error reading {sensor_ip}: {e}")
-                                buffer.append(None)
-                    
-                    # Abfrage für die Sensorkalibrierung
-                    if((buffer[1]) == 3 and buffer[2] is not None):
-                        buffer.append(True) # Index 6: Kalibrierung
-                        print("Sensor ist kalibriert")
-                    else:    
-                        buffer.append(False) # Index 6: Kalibrierung
-                        print("Sensor ist nicht kalibriert")
+                    try:
+                        for service_id, method_id, bitposition, bitsize in required_signal_data_arr:
+                            gen = self.sensor_information_obj.run(sensor_ip, service_id, method_id, bitposition, bitsize)
+                            
+                            for i in gen:
+                                buffer.append(i)
 
-                    # Signal emitten für den spezifischen Sensor (IP-basiert)
-                    self.format_sensor_information_arr(buffer)
-                    buffer.append("Connected") # Index 7: Connection
-                    self.sensor_information_updated.emit(sensor_ip, buffer)
-                    print(f"{sensor_ip}: {buffer}")
+                        if buffer[1] == 3 and buffer[2] is not None:
+                            buffer.append(True)   # Index 6: Kalibrierung
+                        else:    
+                            buffer.append(False)  # Index 6: Kalibrierung
+
+                        # Signal emitten für den spezifischen Sensor (IP-basiert)
+                        self.format_sensor_information_arr(buffer)
+                        buffer.append("Connected")  # Index 7: Connection
+                        self.sensor_information_updated.emit(sensor_ip, buffer)
                     
+                    except StopIteration:
+                        print(f"No response from {sensor_ip}")
+                    except Exception as e:
+                        print(f"Error processing {sensor_ip}: {e}")
 
                 # Nicht verfügbare Sensoren mit Default-Werten verarbeiten
                 for not_available_sensor_ip in not_available:
@@ -292,22 +267,35 @@ class Dashboard(QWidget):
                 import traceback
                 traceback.print_exc()
                 time.sleep(1)
+        
 
     # Hilfsfunktion zur besseren Anzeige der Sensorinformationen
     def format_sensor_information_arr(self, arr):
+     
+        # arr[0]: Software Version 
         arr[0] = arr[0][::-1]  # Bytes umdrehen
-        software_version_number = [int(x, 16) for x in arr[0]]  # Umwandlung von Hex in Int
-        software_version_final = '.'.join(str(x) for x in software_version_number)  # Formattierung als Softwareversion mit .
+        software_version_number = [int(x, 16) for x in arr[0]]
+        software_version_final = '.'.join(str(x) for x in software_version_number)
         arr[0] = software_version_final
-        arr[1] = int(arr[1])
-        arr[5] = arr[5][0]
+        
+        # arr[1]: Sensor Operation Mode - Liste mit 1 Element, zu Int konvertieren
+        arr[1] = int(arr[1][0], 16)
+        
+        # arr[2]: Azimuth Misalignment - Liste, formatieren
         arr[2] = arr[2][::-1]
         arr[2] = ' '.join(str(x) for x in arr[2])
+        
+        # arr[3]: Elevation Misalignment
         arr[3] = arr[3][::-1]
         arr[3] = ' '.join(str(x) for x in arr[3])
-        arr[4] = ' '.join(str(arr[4]))
-        print(arr[4])
+        
+        # arr[4]: Blockage Status - Liste, formatieren
+        arr[4] = ' '.join(''.join(arr[4]))  # Erst kombinieren, dann splitten
 
+        # Valid Detection
+        arr[5] = arr[5][0]  # Valid Detection
+        return arr            
+    
     def _fetch_sensor_value(self, sensor_ip, service_id, method_id, bit_pos, bit_size):
         """Hilfsfunktion für parallele Sensor-Abfragen"""
         try:
