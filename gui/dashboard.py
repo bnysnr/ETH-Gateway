@@ -162,8 +162,6 @@ class Dashboard(QWidget):
                 current_available_sensors = self.available_sensors_checker_obj.get_available()
                 not_available = self.available_sensors_checker_obj.get_not_available()
 
-             #   print(f"Available: {current_available_sensors} - Not available: {not_available}")
-
                 # Jeden verfügbaren Sensor EINZELN verarbeiten (nicht alle auf einmal)
                 for sensor_ip in current_available_sensors:
                     try:
@@ -179,7 +177,7 @@ class Dashboard(QWidget):
                 # Nicht verfügbare Sensoren verarbeiten
                 for not_available_sensor_ip in not_available:
                     self.radar_status_updated.emit(not_available_sensor_ip, RADAR_STATUS_DEFAULT_VALUES)
-           #         print(f"NOT AVAILABLE SENSORS: {not_available_sensor_ip} - {RADAR_STATUS_DEFAULT_VALUES}")
+           
 
                 time.sleep(0.2)
 
@@ -188,7 +186,6 @@ class Dashboard(QWidget):
                 import traceback
                 traceback.print_exc()
                 time.sleep(1)
-
 
 
     def update_egomotion_value_thread(self):
@@ -235,7 +232,7 @@ class Dashboard(QWidget):
                 current_available_sensors = self.available_sensors_checker_obj.get_available()
                 not_available = self.available_sensors_checker_obj.get_not_available()
 
-                print(f"Ausgabe: {current_available_sensors} - {not_available}")
+                #print(f"Ausgabe in Sensor Information: {current_available_sensors} - {not_available}")
 
                 # Jeden verfügbaren Sensor EINZELN verarbeiten
                 for sensor_ip in current_available_sensors:
@@ -286,7 +283,7 @@ class Dashboard(QWidget):
                 # Nicht verfügbare Sensoren mit Default-Werten verarbeiten
                 for not_available_sensor_ip in not_available:
                     self.sensor_information_updated.emit(not_available_sensor_ip, SIGNALE_INFORMATION_NOT_CONNECTED)
-                    
+                    self.radar_status_updated.emit(not_available_sensor_ip, RADAR_STATUS_DEFAULT_VALUES)
 
                 time.sleep(0.2)
 
