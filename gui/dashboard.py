@@ -232,28 +232,36 @@ class Dashboard(QWidget):
                 # Jeden verfügbaren Sensor EINZELN verarbeiten
                 for sensor_ip in current_available_sensors:
                     buffer = []
+                    response_ip = None
 
                     try:
                         for service_id, method_id, bitposition, bitsize in required_signal_data_arr:
                             gen = self.sensor_information_obj.run(sensor_ip, service_id, method_id, bitposition, bitsize)
                             
-                            for i in gen:
-                                buffer.append(i)
+                            for response_ip, value in gen:
+                                buffer.append(value)
 
-                        if buffer[1] == 3 and buffer[2] is not None:
-                            buffer.append(True)   # Index 6: Kalibrierung
-                        else:    
-                            buffer.append(False)  # Index 6: Kalibrierung
+                        # Nur verarbeiten wenn alle 6 Werte da sind
+                        if len(buffer) == 6:
+                            if buffer[1] == 3 and buffer[2] is not None:
+                                buffer.append(True)   # Index 6: Kalibrierung
+                            else:    
+                                buffer.append(False)  # Index 6: Kalibrierung
 
-                        # Signal emitten für den spezifischen Sensor (IP-basiert)
-                        self.format_sensor_information_arr(buffer)
-                        buffer.append("Connected")  # Index 7: Connection
-                        self.sensor_information_updated.emit(sensor_ip, buffer)
+                            # Signal emitten für den spezifischen Sensor (IP-basiert)
+                            self.format_sensor_information_arr(buffer)
+                            buffer.append("Connected")  # Index 7: Connection
+                            self.sensor_information_updated.emit(response_ip, buffer)
+                            print(f"Sensor {response_ip} - Daten: {buffer}")
+                        else:
+                            print(f"Unvollständige Daten für {sensor_ip}: {len(buffer)}/6")
                     
                     except StopIteration:
                         print(f"No response from {sensor_ip}")
                     except Exception as e:
                         print(f"Error processing {sensor_ip}: {e}")
+                        import traceback
+                        traceback.print_exc()
 
                 # Nicht verfügbare Sensoren mit Default-Werten verarbeiten
                 for not_available_sensor_ip in not_available:
@@ -267,7 +275,6 @@ class Dashboard(QWidget):
                 import traceback
                 traceback.print_exc()
                 time.sleep(1)
-        
 
     # Hilfsfunktion zur besseren Anzeige der Sensorinformationen
     def format_sensor_information_arr(self, arr):

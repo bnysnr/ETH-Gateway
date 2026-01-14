@@ -27,16 +27,24 @@ class SensorInformationReader():
         self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
             
-    
-    def run(self, sensor_ip_adress, service_id, method_id, bitposition, bitsize):
         
+    def run(self, sensor_ip_address, service_id, method_id, bitposition, bitsize):
+        """
+        Wartet nur auf UDP-Pakete vom spezifischen Sensor (IP-Filterung)
+        """
         try:
+            timeout_time = time.time() + SENSOR_TIMEOUT
+            
             while True:
                 try:
                     data, addr = self.sock.recvfrom(4096)
-
+                    sender_ip = addr[0]
+                    
+                    # WICHTIG: Nur Pakete vom gesuchten Sensor verarbeiten
+                    if sender_ip != sensor_ip_address:
+                        continue
+                    
                     self.last_any_data = time.time()
-
                     raw = data.hex()
                     
                     if not raw.startswith(service_id + method_id):
@@ -48,19 +56,18 @@ class SensorInformationReader():
         
                     values = self.decode_values(raw)                        
                     start = array_start_pos + array_offset                  
-                    end = start + array_length                              
-                    yield values[start: end]
+                    end = start + array_length
                     
-                    # Nach erfolgreichem Yield die Schleife beenden (ein Wert pro Aufruf)
+                    # Yield mit Sensor-IP zur Sicherheit
+                    yield sender_ip, values[start: end]
                     break
-                    
+                        
                 except socket.timeout:
-                    # Timeout: Kein Paket vom Sensor erhalten
-                    print(f"Timeout for sensor {sensor_ip_adress}")
+                    print(f"Timeout for sensor {sensor_ip_address}")
                     raise StopIteration
 
         except Exception as e:
-            print(f"Fehler im UDP Thread für {sensor_ip_adress}: {e}")
+            print(f"Fehler im UDP Thread für {sensor_ip_address}: {e}")
             raise StopIteration
 
     
@@ -68,3 +75,13 @@ class SensorInformationReader():
     def decode_values(self, hexstring):
         return [hexstring[i:i+2] for i in range(0, len(hexstring), 2)]
     
+"""   
+
+if __name__ == "__main__":
+    sensor_obj = SensorInformationReader()
+    while True:
+        result = sensor_obj.run("192.168.16.13", "0007", "1000", 1311, 8)
+        for a in result:
+            print(a)
+
+"""
