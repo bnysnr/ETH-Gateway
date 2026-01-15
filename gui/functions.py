@@ -4,7 +4,7 @@
 from PyQt5.QtGui import QFontDatabase, QFont, QColor, QBrush
 from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
-from .window_settings import FONT_PATH, FONT_SIZE, STATUS_DESCRIPTIONS, SENSOR_OPERATION_MODE, BLOCKAGE_STATE, BLOCKAGE_STATE_SELFTEST
+from .window_parameter import FONT_PATH, FONT_SIZE, STATUS_DESCRIPTIONS, SENSOR_OPERATION_MODE, BLOCKAGE_STATE, BLOCKAGE_STATE_SELFTEST
 
 
 def load_custom_font():

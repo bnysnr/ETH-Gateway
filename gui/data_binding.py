@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from .functions import create_table_item, get_signal_status_description, get_sensor_operation_mode_description, get_blockage_state_description, get_blockage_state_selftest_description
-from .window_settings import EGO_SIGNAL_UNITS, SENSOR_SIGNAL_INFORMATION, EGO_SIGNALS, SENSOR_CONFIG_SIGNALS, SENSOR_OPERATION_MODE, BLOCKAGE_STATE, BLOCKAGE_STATE_SELFTEST
+from .window_parameter import EGO_SIGNAL_UNITS, SENSOR_SIGNAL_INFORMATION, EGO_SIGNALS, SENSOR_CONFIG_SIGNALS, SENSOR_OPERATION_MODE, BLOCKAGE_STATE, BLOCKAGE_STATE_SELFTEST
 
 AZIMUTH_ELEVATION_RESOLUTION = 0.0000063935301747158
 AZIMUTH_ELEVATION_OFFSET = -0.21

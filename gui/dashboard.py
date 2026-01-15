@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtCore import Qt, pyqtSignal
-from .window_settings import WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, EGOMOTION_DEFAULT_VALUES, RADAR_STATUS_DEFAULT_VALUES, SIGNALE_INFORMATION_NOT_CONNECTED
+from .window_parameter import WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, EGOMOTION_DEFAULT_VALUES, RADAR_STATUS_DEFAULT_VALUES, SIGNALE_INFORMATION_NOT_CONNECTED
 from .functions import load_custom_font
 from .widgets import (
     TitleBox,
@@ -21,7 +21,6 @@ from gui.available_sensors_checker import available_sensors
 import socket
 import struct
 import time
-import concurrent.futures
 
 
 class Dashboard(QWidget):
@@ -156,38 +155,6 @@ class Dashboard(QWidget):
             self.data_binding.update_sensor_information_values(sensor_id, values)
 
   
-    def update_radar_status_thread(self):
-        while self.thread_running:
-            try:
-                current_available_sensors = self.available_sensors_checker_obj.get_available()
-                not_available = self.available_sensors_checker_obj.get_not_available()
-
-                # Jeden verfügbaren Sensor EINZELN verarbeiten (nicht alle auf einmal)
-                for sensor_ip in current_available_sensors:
-                    try:
-                        gen = self.radar_obj.run([sensor_ip], "0007", 1231, 56) 
-                        response_ip, values = next(gen)
-                        self.radar_status_updated.emit(response_ip, values)
-
-                    except StopIteration:
-                        print(f"No response from {sensor_ip}")
-                    except Exception as e:
-                        print(f"Error reading {sensor_ip}: {e}")
-
-                # Nicht verfügbare Sensoren verarbeiten
-                for not_available_sensor_ip in not_available:
-                    self.radar_status_updated.emit(not_available_sensor_ip, RADAR_STATUS_DEFAULT_VALUES)
-           
-
-                time.sleep(0.2)
-
-            except Exception as e:
-                print("THREAD ERROR:", repr(e))
-                import traceback
-                traceback.print_exc()
-                time.sleep(1)
-
-
     def update_egomotion_value_thread(self):
         self.sock.bind((self.SOURCE_IP, self.SOURCE_PORT))
         self.sock.settimeout(0.1)
@@ -213,6 +180,41 @@ class Dashboard(QWidget):
                 for not_available_sensor_ip in not_available:
                     self.egomotion_values_updated.emit(not_available_sensor_ip, EGOMOTION_DEFAULT_VALUES)
                    
+
+
+    def update_radar_status_thread(self):
+        while self.thread_running:
+            try:
+                current_available_sensors = self.available_sensors_checker_obj.get_available()
+                not_available = self.available_sensors_checker_obj.get_not_available()
+
+                # Jeden verfügbaren Sensor EINZELN verarbeiten (nicht alle auf einmal)
+                for sensor_ip in current_available_sensors:
+                    try:
+                        gen = self.radar_obj.run([sensor_ip], "0007", 1231, 56) 
+                        response_ip, values = next(gen)
+                        self.radar_status_updated.emit(response_ip, values)
+
+                    except StopIteration:
+                        print(f"No response from {sensor_ip}")
+                    except Exception as e:
+                        print(f"Error reading {sensor_ip}: {e}")
+
+                # Nicht verfügbare Sensoren verarbeiten
+                for not_available_sensor_ip in not_available:
+                    self.radar_status_updated.emit(not_available_sensor_ip, RADAR_STATUS_DEFAULT_VALUES)
+                    self.sensor_information_updated.emit(not_available_sensor_ip, SIGNALE_INFORMATION_NOT_CONNECTED)
+           
+
+                time.sleep(0.2)
+
+            except Exception as e:
+                print("THREAD ERROR:", repr(e))
+                import traceback
+                traceback.print_exc()
+                time.sleep(1)
+
+
 
     def update_radar_signal_information_thread(self):
         required_signal_data_arr = [

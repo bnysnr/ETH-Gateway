@@ -4,7 +4,7 @@
 from PyQt5.QtWidgets import QFrame, QLabel, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView, QCheckBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from .window_settings import LOGO_PATH, EGO_SIGNALS, SENSOR_CONFIG_SIGNALS, SENSOR_SIGNAL_INFORMATION
+from .window_parameter import LOGO_PATH, EGO_SIGNALS, SENSOR_CONFIG_SIGNALS, SENSOR_SIGNAL_INFORMATION
 from .functions import apply_font_to_table, create_table_item
 from .generic_egomotion_table import GenericEgomotionTable
 from .generic_status_config_table import GenericSignalStatus
