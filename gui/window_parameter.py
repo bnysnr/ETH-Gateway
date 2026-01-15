@@ -2,7 +2,7 @@
 
 # Fenster-Einstellungen
 WINDOW_TITLE = "Vehicle Gateway Dashboard"
-WINDOW_WIDTH = 1900     # 1300
+WINDOW_WIDTH = 1900    
 WINDOW_HEIGHT = 950
 
 # Schriftart

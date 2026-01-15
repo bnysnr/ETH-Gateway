@@ -1,18 +1,12 @@
-from PyQt5.QtWidgets import QWidget, QApplication
-from PyQt5.QtCore import Qt, pyqtSignal
-from .window_parameter import WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT, EGOMOTION_DEFAULT_VALUES, RADAR_STATUS_DEFAULT_VALUES, SIGNALE_INFORMATION_NOT_CONNECTED
-from .functions import load_custom_font
-from .widgets import (
-    TitleBox,
-    Egomotion_SRR_FL,
-    Egomotion_SRR_FR,
-    SignalStatus_SRR_FL,
-    SignalStatus_SRR_FR,
-    Pointcloud_SRR_FL,
-    Pointcloud_SRR_FR,
-    SensorInformationTable_SRR_FL,
-    SensorInformationTable_SRR_FR,
+from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout
+from PyQt5.QtCore import pyqtSignal
+from .window_parameter import (
+    WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT,
+    EGOMOTION_DEFAULT_VALUES, RADAR_STATUS_DEFAULT_VALUES,
+    SIGNALE_INFORMATION_NOT_CONNECTED
 )
+from .functions import load_custom_font
+from .widgets import TitleBox
 from .data_binding import DataBinding
 from publisher.radar_status_reader import radar_status_reader
 from publisher.can_msg_sender import can_msg_sender
@@ -22,189 +16,223 @@ import socket
 import struct
 import time
 
+# Konkrete Dashboard-Implementierungen mit Widget-Imports
+from .widgets import (
+    Egomotion_SRR_FL, Egomotion_SRR_FR, Egomotion_SRR_RL, Egomotion_SRR_RR, Egomotion_ARS_FRONT, Egomotion_ARS_REAR,
+    SignalStatus_SRR_FL, SignalStatus_SRR_FR, SignalStatus_SRR_RL, SignalStatus_SRR_RR, SignalStatus_ARS_FRONT, SignalStatus_ARS_REAR,
+    Pointcloud_SRR_FL, Pointcloud_SRR_FR, Pointcloud_SRR_RL, Pointcloud_SRR_RR, Pointcloud_ARS_FRONT, Pointcloud_ARS_REAR, 
+    SensorInformationTable_SRR_FL, SensorInformationTable_SRR_FR, SensorInformationTable_SRR_RL, SensorInformationTable_SRR_RR, SensorInformationTable_ARS_FRONT, SensorInformationTable_ARS_REAR
+)
 
-class Dashboard(QWidget):
-    """Hauptfenster des Dashboards"""
 
-    radar_status_updated = pyqtSignal(str, list)       # sensor_id, values
-    egomotion_values_updated = pyqtSignal(str, list)  # sensor_id, values
-    sensor_information_updated = pyqtSignal(str, list)  # sensor_id, values
+class BaseDashboard(QWidget):
+    """Basis-Klasse für alle Dashboard-Pages mit gemeinsamer Logik"""
+    
+    radar_status_updated = pyqtSignal(str, list)
+    egomotion_values_updated = pyqtSignal(str, list)
+    sensor_information_updated = pyqtSignal(str, list)
 
-    def __init__(self):
+    def __init__(self, sensor_config):
+
         super().__init__()
-
+        self.sensor_config = sensor_config
+        
         # GUI-Font laden
         self.gui_font = load_custom_font()
         QApplication.instance().setFont(self.gui_font)
-
+        
         # Fenster Einstellungen
         self.setWindowTitle(WINDOW_TITLE)
         self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
-
+        
+        # Widget-Container
+        self.egomotion_boxes = []
+        self.signalstatus_boxes = []
+        self.checkboxes = []
+        self.sensor_information_tables = []
+        
         # Widgets erstellen
         self._create_widgets()
+        self._setup_layout()
         self._setup_data_binding()
-
+        
         # Sensor-Objekte
         self.radar_obj = radar_status_reader()
         self.can_egomotion_obj = can_msg_sender()
         self.sensor_information_obj = SensorInformationReader()
         self.available_sensors_checker_obj = available_sensors()
-        
-
         self.available_sensors_checker_obj.start()
-
-        # Netzwerk
-        self.SOURCE_IP = "127.0.0.1"
-        self.SOURCE_PORT = 5005
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
+        
         # Thread Flag
         self.thread_running = True
-
+        
         # Signale verbinden
         self.radar_status_updated.connect(self.update_signal_status_values)
         self.egomotion_values_updated.connect(self.update_egomotion_values)
         self.sensor_information_updated.connect(self.update_sensor_information)
 
-        # Mapping IP -> Sensor
-        self.IP_TO_SENSOR = {
-            "srr_fl": "192.168.16.12",
-            "srr_fr": "192.168.16.13"
-        }
-
-        self.available_ip_addresses = []
-
     def _create_widgets(self):
+        """Erstellt alle Widget-Komponenten dynamisch"""
         self.title_box = TitleBox(self, self.gui_font)
+        
+        widget_classes = self.sensor_config['widget_classes']
+        
+        # Egomotion Widgets
+        for widget_class in widget_classes['egomotion']:
+            widget = widget_class(self, self.gui_font)
+            self.egomotion_boxes.append(widget)
+        
+        # Signal Status Widgets
+        for widget_class in widget_classes['signal_status']:
+            widget = widget_class(self, self.gui_font)
+            self.signalstatus_boxes.append(widget)
+        
+        # Pointcloud Checkboxes (benötigen Signal Status Box als Referenz)
+        for i, widget_class in enumerate(widget_classes['pointcloud']):
+            widget = widget_class(self, self.gui_font, self.signalstatus_boxes[i])
+            self.checkboxes.append(widget)
+        
+        # Sensor Information Tables
+        for widget_class in widget_classes['sensor_info']:
+            widget = widget_class(self, self.gui_font)
+            self.sensor_information_tables.append(widget)
 
-        # Egomotion
-        self.egomotion_box_srr_fl = Egomotion_SRR_FL(self, self.gui_font)
-        self.egomotion_box_srr_fr = Egomotion_SRR_FR(self, self.gui_font)
+    def _setup_layout(self):
+        """Setzt Layout auf"""
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(main_layout)
 
-        # Signal Status
-        self.signalstatus_box_srr_fl = SignalStatus_SRR_FL(self, self.gui_font)
-        self.signalstatus_box_srr_fr = SignalStatus_SRR_FR(self, self.gui_font)
-
-        # Pointcloud Checkbox
-        self.checkbox_srr_fl = Pointcloud_SRR_FL(self, self.gui_font, self.signalstatus_box_srr_fl)
-        self.checkbox_srr_fr = Pointcloud_SRR_FR(self, self.gui_font, self.signalstatus_box_srr_fr)
-
-        # Sensorinformation
-        self.sensor_information_table_srr_fl = SensorInformationTable_SRR_FL(self, self.gui_font)
-        self.sensor_information_table_srr_fr = SensorInformationTable_SRR_FR(self, self.gui_font)
-
-   
     def _setup_data_binding(self):
+        """Setzt Data Binding auf - FIXED: Richtige Zuordnung der IPs"""
+        sensor_ips = list(self.sensor_config['sensors'].values())
+        
+        # Debug-Ausgabe
+        print(f"\n=== Data Binding Setup für {self.__class__.__name__} ===")
+        print(f"Sensor IPs: {sensor_ips}")
+        print(f"Anzahl Egomotion Boxes: {len(self.egomotion_boxes)}")
+        print(f"Anzahl Signal Status Boxes: {len(self.signalstatus_boxes)}")
+        print(f"Anzahl Sensor Info Tables: {len(self.sensor_information_tables)}")
+        
+        # Mapping erstellen
+        egomotion_mapping = {}
+        signal_status_mapping = {}
+        sensor_info_mapping = {}
+        
+        for i, ip in enumerate(sensor_ips):
+            if i < len(self.egomotion_boxes):
+                egomotion_mapping[ip] = self.egomotion_boxes[i].table
+                print(f"Egomotion: {ip} -> {self.egomotion_boxes[i].__class__.__name__}")
+            
+            if i < len(self.signalstatus_boxes):
+                signal_status_mapping[ip] = self.signalstatus_boxes[i].table
+                print(f"Signal Status: {ip} -> {self.signalstatus_boxes[i].__class__.__name__}")
+            
+            if i < len(self.sensor_information_tables):
+                sensor_info_mapping[ip] = self.sensor_information_tables[i].table
+                print(f"Sensor Info: {ip} -> {self.sensor_information_tables[i].__class__.__name__}")
+        
+        print("="*50 + "\n")
+        
         self.data_binding = DataBinding(
-            sensor_config_tables={
-                "192.168.16.12": self.signalstatus_box_srr_fl.table,
-                "192.168.16.13": self.signalstatus_box_srr_fr.table,
-            },
-            egomotion_tables={
-                "192.168.16.12": self.egomotion_box_srr_fl.table,
-                "192.168.16.13": self.egomotion_box_srr_fr.table,
-            },
-            sensor_information_tables={
-                "192.168.16.12": self.sensor_information_table_srr_fl.table,
-                "192.168.16.13": self.sensor_information_table_srr_fr.table,
-            },
+            sensor_config_tables=signal_status_mapping,
+            egomotion_tables=egomotion_mapping,
+            sensor_information_tables=sensor_info_mapping,
             gui_font=self.gui_font,
         )
 
-
     def resizeEvent(self, event):
+        """Definiert Spaltenverhältnisse"""
         super().resizeEvent(event)
-
-        ego_width = self.egomotion_box_srr_fl.table.viewport().width()
-        for box in (self.egomotion_box_srr_fl, self.egomotion_box_srr_fr):
-            box.table.setColumnWidth(0, int(ego_width * 0.55))
-            box.table.setColumnWidth(1, int(ego_width * 0.15))
-            box.table.setColumnWidth(2, int(ego_width * 0.30))
-
-        signal_width = self.signalstatus_box_srr_fl.table.viewport().width()
-        for box in (self.signalstatus_box_srr_fl, self.signalstatus_box_srr_fr):
-            box.table.setColumnWidth(0, int(signal_width * 0.4))
-            box.table.setColumnWidth(1, int(signal_width * 0.2))
-            box.table.setColumnWidth(2, int(signal_width * 0.4))
-
-        sensor_width = self.sensor_information_table_srr_fl.table.viewport().width()
-        for table in (self.sensor_information_table_srr_fl.table, self.sensor_information_table_srr_fr.table):
-            table.setColumnWidth(0, int(sensor_width * 0.4))
-            table.setColumnWidth(1, int(sensor_width * 0.25))
-            table.setColumnWidth(2, int(sensor_width * 0.35))
+        
+        # Egomotion Spalten
+        if self.egomotion_boxes:
+            ego_width = self.egomotion_boxes[0].table.viewport().width()
+            for box in self.egomotion_boxes:
+                box.table.setColumnWidth(0, int(ego_width * 0.55))
+                box.table.setColumnWidth(1, int(ego_width * 0.15))
+                box.table.setColumnWidth(2, int(ego_width * 0.30))
+        
+        # Signal Status Spalten
+        if self.signalstatus_boxes:
+            signal_width = self.signalstatus_boxes[0].table.viewport().width()
+            for box in self.signalstatus_boxes:
+                box.table.setColumnWidth(0, int(signal_width * 0.4))
+                box.table.setColumnWidth(1, int(signal_width * 0.2))
+                box.table.setColumnWidth(2, int(signal_width * 0.4))
+        
+        # Sensor Information Spalten
+        if self.sensor_information_tables:
+            sensor_width = self.sensor_information_tables[0].table.viewport().width()
+            for table in self.sensor_information_tables:
+                table.table.setColumnWidth(0, int(sensor_width * 0.4))
+                table.table.setColumnWidth(1, int(sensor_width * 0.25))
+                table.table.setColumnWidth(2, int(sensor_width * 0.35))
 
     def showEvent(self, event):
         super().showEvent(event)
         self.resizeEvent(None)
 
-    # Funktion zum prüfen der aktuell verfügbaren Sensoren
-    def check_available_sensors(self):
-        pass
-  
+    # Update Funktionen
     def update_signal_status_values(self, sensor_id: str, values: list):
         if self.data_binding:
             self.data_binding.update_signal_status_values(sensor_id, values)
-   
+
     def update_egomotion_values(self, sensor_id, values):
+        print(f"[{self.__class__.__name__}] Egomotion Update für {sensor_id}: {values[:3]}...")  # Debug
         if self.data_binding:
             self.data_binding.update_egomotion_values(sensor_id, values)
+        else:
+            print(f"[{self.__class__.__name__}] WARNUNG: data_binding ist None!")
 
     def update_sensor_information(self, sensor_id: str, values: list):
         if self.data_binding:
             self.data_binding.update_sensor_information_values(sensor_id, values)
 
-  
+    def distribute_egomotion_data(self, values: list):
+        """Empfängt Egomotion-Daten vom zentralen Distributor und verteilt sie an eigene Sensoren"""
+        current_available_sensors = self.available_sensors_checker_obj.get_available()
+        not_available = self.available_sensors_checker_obj.get_not_available()
+        
+        # Aktualisiere nur die Sensoren, die zu DIESEM Dashboard gehören
+        for sensor_ip in current_available_sensors:
+            if sensor_ip in self.sensor_config['sensors'].values():
+                self.egomotion_values_updated.emit(sensor_ip, values)
+        
+        for not_available_sensor_ip in not_available:
+            if not_available_sensor_ip in self.sensor_config['sensors'].values():
+                self.egomotion_values_updated.emit(not_available_sensor_ip, EGOMOTION_DEFAULT_VALUES)
+
     def update_egomotion_value_thread(self):
-        self.sock.bind((self.SOURCE_IP, self.SOURCE_PORT))
-        self.sock.settimeout(0.1)
-        last_update_time = 0
-        latest_values = None
-
-        while self.thread_running:
-            try:
-                data, _ = self.sock.recvfrom(1024)
-                num_floats = len(data) // 4
-                latest_values = struct.unpack("<" + "f" * num_floats, data)
-                current_available_sensors = self.available_sensors_checker_obj.get_available()
-                not_available = self.available_sensors_checker_obj.get_not_available()
-            except socket.timeout:
-                pass
-
-            current_time = time.time()
-            if latest_values and current_time - last_update_time >= 0.5:
-                for sensor_ip in current_available_sensors:
-                    self.egomotion_values_updated.emit(sensor_ip, list(latest_values))
-                    last_update_time = current_time
-
-                for not_available_sensor_ip in not_available:
-                    self.egomotion_values_updated.emit(not_available_sensor_ip, EGOMOTION_DEFAULT_VALUES)
-                   
-
+        """DEPRECATED - Wird nicht mehr verwendet, da zentral verwaltet"""
+        pass
 
     def update_radar_status_thread(self):
+        """Thread für Radar-Status-Updates"""
         while self.thread_running:
             try:
                 current_available_sensors = self.available_sensors_checker_obj.get_available()
                 not_available = self.available_sensors_checker_obj.get_not_available()
 
-                # Jeden verfügbaren Sensor EINZELN verarbeiten (nicht alle auf einmal)
                 for sensor_ip in current_available_sensors:
+                    # Prüfe ob dieser Sensor zu DIESEM Dashboard gehört
+                    if sensor_ip not in self.sensor_config['sensors'].values():
+                        continue
+                    
                     try:
-                        gen = self.radar_obj.run([sensor_ip], "0007", 1231, 56) 
+                        gen = self.radar_obj.run([sensor_ip], "0007", 1231, 56)
                         response_ip, values = next(gen)
                         self.radar_status_updated.emit(response_ip, values)
-
                     except StopIteration:
                         print(f"No response from {sensor_ip}")
                     except Exception as e:
                         print(f"Error reading {sensor_ip}: {e}")
 
-                # Nicht verfügbare Sensoren verarbeiten
                 for not_available_sensor_ip in not_available:
-                    self.radar_status_updated.emit(not_available_sensor_ip, RADAR_STATUS_DEFAULT_VALUES)
-                    self.sensor_information_updated.emit(not_available_sensor_ip, SIGNALE_INFORMATION_NOT_CONNECTED)
-           
+                    # Prüfe ob dieser Sensor zu DIESEM Dashboard gehört
+                    if not_available_sensor_ip in self.sensor_config['sensors'].values():
+                        self.radar_status_updated.emit(not_available_sensor_ip, RADAR_STATUS_DEFAULT_VALUES)
+                        self.sensor_information_updated.emit(not_available_sensor_ip, SIGNALE_INFORMATION_NOT_CONNECTED)
 
                 time.sleep(0.2)
 
@@ -214,16 +242,15 @@ class Dashboard(QWidget):
                 traceback.print_exc()
                 time.sleep(1)
 
-
-
     def update_radar_signal_information_thread(self):
+        """Thread für Sensor-Information-Updates"""
         required_signal_data_arr = [
-            ["0007", "1000", 199, 32],      # Software Version
-            ["0009", "1000", 191, 8],       # Sensor Operation Mode
-            ["0001", "1000", 575, 16],      # Azimuth Misalignment
-            ["0001", "1000", 591, 16],      # Elevation Misalignment
-            ["0007", "1000", 1311, 8],      # Blockage Status
-            ["0001", "1000", 479, 16],      # Valid Detections
+            ["0007", "1000", 199, 32],   # Software Version
+            ["0009", "1000", 191, 8],    # Sensor Operation Mode
+            ["0001", "1000", 575, 16],   # Azimuth Misalignment
+            ["0001", "1000", 591, 16],   # Elevation Misalignment
+            ["0007", "1000", 1311, 8],   # Blockage Status
+            ["0001", "1000", 479, 16],   # Valid Detections
         ]
 
         while self.thread_running:
@@ -231,33 +258,32 @@ class Dashboard(QWidget):
                 current_available_sensors = self.available_sensors_checker_obj.get_available()
                 not_available = self.available_sensors_checker_obj.get_not_available()
 
-                # Jeden verfügbaren Sensor EINZELN verarbeiten
                 for sensor_ip in current_available_sensors:
+                    # Prüfe ob dieser Sensor zu DIESEM Dashboard gehört
+                    if sensor_ip not in self.sensor_config['sensors'].values():
+                        continue
+                    
                     buffer = []
                     response_ip = None
 
                     try:
                         for service_id, method_id, bitposition, bitsize in required_signal_data_arr:
                             gen = self.sensor_information_obj.run(sensor_ip, service_id, method_id, bitposition, bitsize)
-                            
                             for response_ip, value in gen:
                                 buffer.append(value)
 
-                        # Nur verarbeiten wenn alle 6 Werte da sind
                         if len(buffer) == 6:
                             if buffer[1] == 3 and buffer[2] is not None:
-                                buffer.append(True)   # Index 6: Kalibrierung
-                            else:    
-                                buffer.append(False)  # Index 6: Kalibrierung
+                                buffer.append(True)
+                            else:
+                                buffer.append(False)
 
-                            # Signal emitten für den spezifischen Sensor (IP-basiert)
                             self.format_sensor_information_arr(buffer)
-                            buffer.append("Connected")  # Index 7: Connection
+                            buffer.append("Connected")
                             self.sensor_information_updated.emit(response_ip, buffer)
-                            print(f"Sensor {response_ip} - Daten: {buffer}")
                         else:
                             print(f"Unvollständige Daten für {sensor_ip}: {len(buffer)}/6")
-                    
+
                     except StopIteration:
                         print(f"No response from {sensor_ip}")
                     except Exception as e:
@@ -265,10 +291,11 @@ class Dashboard(QWidget):
                         import traceback
                         traceback.print_exc()
 
-                # Nicht verfügbare Sensoren mit Default-Werten verarbeiten
                 for not_available_sensor_ip in not_available:
-                    self.sensor_information_updated.emit(not_available_sensor_ip, SIGNALE_INFORMATION_NOT_CONNECTED)
-                    self.radar_status_updated.emit(not_available_sensor_ip, RADAR_STATUS_DEFAULT_VALUES)
+                    # Prüfe ob dieser Sensor zu DIESEM Dashboard gehört
+                    if not_available_sensor_ip in self.sensor_config['sensors'].values():
+                        self.sensor_information_updated.emit(not_available_sensor_ip, SIGNALE_INFORMATION_NOT_CONNECTED)
+                        self.radar_status_updated.emit(not_available_sensor_ip, RADAR_STATUS_DEFAULT_VALUES)
 
                 time.sleep(0.2)
 
@@ -278,61 +305,84 @@ class Dashboard(QWidget):
                 traceback.print_exc()
                 time.sleep(1)
 
-    # Hilfsfunktion zur besseren Anzeige der Sensorinformationen
     def format_sensor_information_arr(self, arr):
-     
-        # arr[0]: Software Version 
-        arr[0] = arr[0][::-1]  # Bytes umdrehen
+        """Formatiert Sensor-Informations-Array für Anzeige"""
+        arr[0] = arr[0][::-1]
         software_version_number = [int(x, 16) for x in arr[0]]
         software_version_final = '.'.join(str(x) for x in software_version_number)
         arr[0] = software_version_final
-        
-        # arr[1]: Sensor Operation Mode - Liste mit 1 Element, zu Int konvertieren
+
         arr[1] = int(arr[1][0], 16)
-        
-        # arr[2]: Azimuth Misalignment - Liste, formatieren
+
         arr[2] = arr[2][::-1]
         arr[2] = ' '.join(str(x) for x in arr[2])
-        
-        # arr[3]: Elevation Misalignment
+
         arr[3] = arr[3][::-1]
         arr[3] = ' '.join(str(x) for x in arr[3])
-        
-        # arr[4]: Blockage Status - Liste, formatieren
-        arr[4] = ' '.join(''.join(arr[4]))  # Erst kombinieren, dann splitten
 
-        # Valid Detection
-        arr[5] = arr[5][0]  # Valid Detection
-        return arr            
-    
-    def _fetch_sensor_value(self, sensor_ip, service_id, method_id, bit_pos, bit_size):
-        """Hilfsfunktion für parallele Sensor-Abfragen"""
-        try:
-            gen = self.sensor_information_obj.run(
-                sensor_ip,
-                service_id, 
-                method_id, 
-                bit_pos, 
-                bit_size
-            )
-            value = next(gen)
+        arr[4] = ' '.join(''.join(arr[4]))
+        arr[5] = arr[5][0]
+        return arr
 
-            if isinstance(value, list):
-                value = value[0] if len(value) == 1 else value
-
-            return value
-        except StopIteration:
-            print(f"No response from {sensor_ip} - Service: {service_id}")
-            return None
-        except Exception as e:
-            print(f"Error reading from {sensor_ip} - Service: {service_id}, Method: {method_id}: {e}")
-            return None
-
-  
     def closeEvent(self, event):
+        """Cleanup beim Schließen"""
         self.thread_running = False
-        try:
-            self.sock.close()
-        except Exception:
-            pass
         super().closeEvent(event)
+
+
+
+
+
+class Dashboard(BaseDashboard):
+    """Dashboard für Front-Sensoren (FL, FR)"""
+    def __init__(self):
+        config = {
+            'sensors': {
+                'srr_fl': "192.168.16.12",
+                'srr_fr': "192.168.16.13"
+            },
+            'widget_classes': {
+                'egomotion': [Egomotion_SRR_FL, Egomotion_SRR_FR],
+                'signal_status': [SignalStatus_SRR_FL, SignalStatus_SRR_FR],
+                'pointcloud': [Pointcloud_SRR_FL, Pointcloud_SRR_FR],
+                'sensor_info': [SensorInformationTable_SRR_FL, SensorInformationTable_SRR_FR]
+            }
+        }
+        super().__init__(config)
+
+
+class Page2(BaseDashboard):
+    """Dashboard für Rear-Sensoren (RL, RR)"""
+    def __init__(self):
+        config = {
+            'sensors': {
+                'srr_rl': "192.168.16.14",
+                'srr_rr': "192.168.16.15"
+            },
+            'widget_classes': {
+                'egomotion': [Egomotion_SRR_RL, Egomotion_SRR_RR],
+                'signal_status': [SignalStatus_SRR_RL, SignalStatus_SRR_RR],
+                'pointcloud': [Pointcloud_SRR_RL, Pointcloud_SRR_RR],
+                'sensor_info': [SensorInformationTable_SRR_RL, SensorInformationTable_SRR_RR]
+            }
+        }
+        super().__init__(config)
+
+
+class Page3(BaseDashboard):
+    """Dashboard für ARS Sensoren"""
+    def __init__(self):
+        config = {
+            'sensors': {
+                'ars_front': "192.168.16.11",
+                'ars_rear': "192.168.16.16"
+            },
+            'widget_classes': {
+                'egomotion': [Egomotion_ARS_FRONT, Egomotion_ARS_REAR],
+                'signal_status': [SignalStatus_ARS_FRONT, SignalStatus_ARS_REAR],
+                'pointcloud': [Pointcloud_ARS_FRONT, Pointcloud_ARS_REAR],
+                'sensor_info': [SensorInformationTable_ARS_FRONT, SensorInformationTable_ARS_REAR]
+            }
+        }
+        super().__init__(config)
+

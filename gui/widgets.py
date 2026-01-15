@@ -70,6 +70,78 @@ class Egomotion_SRR_FR(GenericEgomotionTable):
         box_h = int(parent.height() * 0.38)         # Position auf der horizontalen Ebene 
         box_w = int(parent.width() * 0.3)           # Boxbreite
         return (20, box_y, box_w, box_h)            
+     
+
+class Egomotion_SRR_RL(GenericEgomotionTable):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="SRR RL - Egomotion",
+            row_labels=EGO_SIGNALS,
+            columns=["Signalname", "Unit", "Value"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        box_y = int(parent.height() * 0.1)          # Position auf der vertikalen Ebene
+        box_h = int(parent.height() * 0.38)         # Position auf der horizontalen Ebene 
+        box_w = int(parent.width() * 0.3)           # Boxbreite
+        return (20, box_y, box_w, box_h)            # Abstand zum linken Rand: 10
+    
+
+class Egomotion_SRR_RR(GenericEgomotionTable):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="SRR RR - Egomotion",
+            row_labels=EGO_SIGNALS,
+            columns=["Signalname", "Unit", "Value"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        box_y = int(parent.height() * 0.54)         # Position auf der vertikalen Ebene
+        box_h = int(parent.height() * 0.38)         # Position auf der horizontalen Ebene 
+        box_w = int(parent.width() * 0.3)           # Boxbreite
+        return (20, box_y, box_w, box_h)    
+
+
+class Egomotion_ARS_FRONT(GenericEgomotionTable):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="ARS FRONT - Egomotion",
+            row_labels=EGO_SIGNALS,
+            columns=["Signalname", "Unit", "Value"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        box_y = int(parent.height() * 0.1)          # Position auf der vertikalen Ebene
+        box_h = int(parent.height() * 0.38)         # Position auf der horizontalen Ebene 
+        box_w = int(parent.width() * 0.3)           # Boxbreite
+        return (20, box_y, box_w, box_h)            # Abstand zum linken Rand: 10
+    
+
+class Egomotion_ARS_REAR(GenericEgomotionTable):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="ARS REAR - Egomotion",
+            row_labels=EGO_SIGNALS,
+            columns=["Signalname", "Unit", "Value"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        box_y = int(parent.height() * 0.54)         # Position auf der vertikalen Ebene
+        box_h = int(parent.height() * 0.38)         # Position auf der horizontalen Ebene 
+        box_w = int(parent.width() * 0.3)           # Boxbreite
+        return (20, box_y, box_w, box_h)    
 
 
 class SignalStatus_SRR_FL(GenericSignalStatus):
@@ -112,6 +184,88 @@ class SignalStatus_SRR_FR(GenericSignalStatus):
         return (x, y, w, h)
     
 
+class SignalStatus_SRR_RL(GenericSignalStatus):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="SRR RL - Sensor Config Message Status",
+            row_labels=SENSOR_CONFIG_SIGNALS,
+            columns=["Signalname", "Status", "Description"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        # Position rechts neben Egomotion
+        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
+        y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene 
+        w = int(parent.width() * 0.35)                  # Boxbreite
+        h = int(parent.height() * 0.38)                 # Boxhöhe
+        return (x, y, w, h)
+    
+
+class SignalStatus_SRR_RR(GenericSignalStatus):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="SRR RR - Sensor Config Message Status",
+            row_labels=SENSOR_CONFIG_SIGNALS,
+            columns=["Signalname", "Status", "Description"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        # Position rechts neben Egomotion
+        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
+        y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
+        w = int(parent.width() * 0.35)                  # Boxbreite
+        h = int(parent.height() * 0.38)                 # Boxhöhe
+        return (x, y, w, h)
+    
+
+class SignalStatus_ARS_FRONT(GenericSignalStatus):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="ARS FRONT - Sensor Config Message Status",
+            row_labels=SENSOR_CONFIG_SIGNALS,
+            columns=["Signalname", "Status", "Description"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        # Position rechts neben Egomotion
+        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
+        y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene 
+        w = int(parent.width() * 0.35)                  # Boxbreite
+        h = int(parent.height() * 0.38)                 # Boxhöhe
+        return (x, y, w, h)
+    
+
+class SignalStatus_ARS_REAR(GenericSignalStatus):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="ARS REAR - Sensor Config Message Status",
+            row_labels=SENSOR_CONFIG_SIGNALS,
+            columns=["Signalname", "Status", "Description"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        # Position rechts neben Egomotion
+        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
+        y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
+        w = int(parent.width() * 0.35)                  # Boxbreite
+        h = int(parent.height() * 0.38)                 # Boxhöhe
+        return (x, y, w, h)
+
+
+        
+
 class Pointcloud_SRR_FL(PointcloudCheckbox):
     def __init__(self, parent, gui_font, sensor_status_box):
         super().__init__(
@@ -129,6 +283,70 @@ class Pointcloud_SRR_FL(PointcloudCheckbox):
     
 
 class Pointcloud_SRR_FR(PointcloudCheckbox):
+    def __init__(self, parent, gui_font, sensor_status_box):
+        super().__init__(
+            parent,
+            gui_font,
+            lambda parent: self._geometry(sensor_status_box)
+        )
+
+    def _geometry(self, sensor_status_box):
+        x = sensor_status_box.x() + 7
+        y = sensor_status_box.y() + sensor_status_box.height() 
+        w = 250
+        h = 20
+        return (x, y, w, h)
+    
+class Pointcloud_SRR_RL(PointcloudCheckbox):
+    def __init__(self, parent, gui_font, sensor_status_box):
+        super().__init__(
+            parent,
+            gui_font,
+            lambda parent: self._geometry(sensor_status_box)
+        )
+
+    def _geometry(self, sensor_status_box):
+        x = sensor_status_box.x() + 7
+        y = sensor_status_box.y() + sensor_status_box.height()
+        w = 250
+        h = 20
+        return (x, y, w, h)
+    
+
+class Pointcloud_SRR_RR(PointcloudCheckbox):
+    def __init__(self, parent, gui_font, sensor_status_box):
+        super().__init__(
+            parent,
+            gui_font,
+            lambda parent: self._geometry(sensor_status_box)
+        )
+
+    def _geometry(self, sensor_status_box):
+        x = sensor_status_box.x() + 7
+        y = sensor_status_box.y() + sensor_status_box.height() 
+        w = 250
+        h = 20
+        return (x, y, w, h)
+
+
+    
+class Pointcloud_ARS_FRONT(PointcloudCheckbox):
+    def __init__(self, parent, gui_font, sensor_status_box):
+        super().__init__(
+            parent,
+            gui_font,
+            lambda parent: self._geometry(sensor_status_box)
+        )
+
+    def _geometry(self, sensor_status_box):
+        x = sensor_status_box.x() + 7
+        y = sensor_status_box.y() + sensor_status_box.height()
+        w = 250
+        h = 20
+        return (x, y, w, h)
+    
+
+class Pointcloud_ARS_REAR(PointcloudCheckbox):
     def __init__(self, parent, gui_font, sensor_status_box):
         super().__init__(
             parent,
@@ -184,3 +402,80 @@ class SensorInformationTable_SRR_FR(GenericSignalStatus):
         return (x, y, w, h)
     
 
+class SensorInformationTable_SRR_RL(GenericSignalStatus):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="SRR RL - Sensor Information",
+            row_labels=SENSOR_SIGNAL_INFORMATION,
+            columns=["Signalname", "Result", "Description"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        # Position rechts neben Egomotion
+        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
+        y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene
+        w = int(parent.width() * 0.33)                   # Boxbreite
+        h = int(parent.height() * 0.38)                 # Boxhöhe
+        return (x, y, w, h)
+    
+class SensorInformationTable_SRR_RR(GenericSignalStatus):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="SRR RR - Sensor Information",
+            row_labels=SENSOR_SIGNAL_INFORMATION,
+            columns=["Signalname", "Result", "Description"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        # Position rechts neben Egomotion
+        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
+        y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
+        w = int(parent.width() * 0.33)                 # Boxbreite
+        h = int(parent.height() * 0.38)                 # Boxhöhe
+        return (x, y, w, h)
+    
+
+class SensorInformationTable_ARS_FRONT(GenericSignalStatus):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="ARS FRONT - Sensor Information",
+            row_labels=SENSOR_SIGNAL_INFORMATION,
+            columns=["Signalname", "Result", "Description"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        # Position rechts neben Egomotion
+        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
+        y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene
+        w = int(parent.width() * 0.33)                   # Boxbreite
+        h = int(parent.height() * 0.38)                 # Boxhöhe
+        return (x, y, w, h)
+    
+class SensorInformationTable_ARS_REAR(GenericSignalStatus):
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="ARS REAR - Sensor Information",
+            row_labels=SENSOR_SIGNAL_INFORMATION,
+            columns=["Signalname", "Result", "Description"],
+            geometry_func=self._geometry
+        )
+
+    def _geometry(self, parent):
+        # Position rechts neben Egomotion
+        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
+        y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
+        w = int(parent.width() * 0.33)                 # Boxbreite
+        h = int(parent.height() * 0.38)                 # Boxhöhe
+        return (x, y, w, h)
+    
