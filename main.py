@@ -1,5 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton
+from PyQt5.QtCore import Qt
 from gui.dashboard import Dashboard, Page2, Page3, BaseDashboard
 from publisher.can_msg_sender import can_msg_sender
 import threading
@@ -21,7 +22,6 @@ class EgomotionDistributor:
         """Registriert ein Dashboard für Egomotion-Updates"""
         if dashboard not in self.dashboards:
             self.dashboards.append(dashboard)
-            print(f"Dashboard {dashboard.__class__.__name__} registriert für Egomotion-Updates")
     
     def run(self):
         """Hauptloop - empfängt Daten und verteilt an alle Dashboards"""
@@ -42,7 +42,6 @@ class EgomotionDistributor:
             
             current_time = time.time()
             if latest_values and current_time - last_update_time >= 0.5:
-                # Verteile Daten an ALLE registrierten Dashboards
                 for dashboard in self.dashboards:
                     if hasattr(dashboard, 'distribute_egomotion_data'):
                         dashboard.distribute_egomotion_data(list(latest_values))
@@ -65,33 +64,12 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         
-        # Hauptlayout
+        # Hauptlayout (vertikal)
         main_layout = QVBoxLayout(central_widget)
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
         
-        # Navigation-Bar
-        nav_layout = QHBoxLayout()
-        nav_layout.setContentsMargins(2, 2, 2, 2)
-        nav_layout.setSpacing(5)
-        
-        # Navigation-Buttons
-        self.btn_page1 = QPushButton("SRR Front Sensors")
-        self.btn_page2 = QPushButton("SRR Rear Sensors")
-        self.btn_page3 = QPushButton("ARS Sensors")
-        
-        button_style = "QPushButton { padding: 8px 15px; font-weight: bold; }"
-        for btn in [self.btn_page1, self.btn_page2, self.btn_page3]:
-            btn.setStyleSheet(button_style)
-        
-        nav_layout.addWidget(self.btn_page1)
-        nav_layout.addWidget(self.btn_page2)
-        nav_layout.addWidget(self.btn_page3)
-        nav_layout.addStretch()
-        
-        main_layout.addLayout(nav_layout)
-        
-        # StackedWidget
+        # StackedWidget (nimmt den verfügbaren Platz ein)
         self.stacked_widget = QStackedWidget()
         
         # Seiten erstellen
@@ -105,6 +83,33 @@ class MainWindow(QMainWindow):
             self.stacked_widget.addWidget(page)
         
         main_layout.addWidget(self.stacked_widget)
+        
+        # Navigation-Bar UNTEN
+        nav_layout = QHBoxLayout()
+        nav_layout.setContentsMargins(10, 10, 10, 10)
+        nav_layout.setSpacing(10)
+        
+        # Stretch VOR den Buttons für Zentrierung
+        nav_layout.addStretch()
+        
+        # Navigation-Buttons
+        self.btn_page1 = QPushButton("SRR Front Sensors")
+        self.btn_page2 = QPushButton("SRR Rear Sensors")
+        self.btn_page3 = QPushButton("ARS Sensors")
+        
+        button_style = "QPushButton { padding: 8px 15px; font-weight: bold; }"
+        for btn in [self.btn_page1, self.btn_page2, self.btn_page3]:
+            btn.setStyleSheet(button_style)
+        
+        nav_layout.addWidget(self.btn_page1)
+        nav_layout.addWidget(self.btn_page2)
+        nav_layout.addWidget(self.btn_page3)
+        
+        # Stretch NACH den Buttons für Zentrierung
+        nav_layout.addStretch()
+        
+        # Navigation-Layout zum Hauptlayout hinzufügen (UNTEN)
+        main_layout.addLayout(nav_layout)
         
         # Button-Signale verbinden
         self.btn_page1.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
@@ -145,7 +150,6 @@ class MainWindow(QMainWindow):
     def _start_page_threads(self, page: BaseDashboard):
         """Startet Threads für eine spezifische Dashboard-Seite (OHNE Egomotion)"""
         threads = [
-            # KEIN Egomotion Thread mehr - wird zentral verwaltet!
             threading.Thread(target=page.update_radar_status_thread, daemon=True),
             threading.Thread(target=page.update_radar_signal_information_thread, daemon=True)
         ]
