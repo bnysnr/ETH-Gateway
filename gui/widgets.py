@@ -157,9 +157,9 @@ class SignalStatus_SRR_FL(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.30)                  # Position auf horizontaler Ebene
         y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene 
-        w = int(parent.width() * 0.35)                  # Boxbreite
+        w = int(parent.width() * 0.33)                  # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
@@ -177,9 +177,9 @@ class SignalStatus_SRR_FR(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.30)                  # Position auf horizontaler Ebene
         y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.35)                  # Boxbreite
+        w = int(parent.width() * 0.33)                  # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
@@ -197,9 +197,9 @@ class SignalStatus_SRR_RL(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.30)                  # Position auf horizontaler Ebene
         y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene 
-        w = int(parent.width() * 0.35)                  # Boxbreite
+        w = int(parent.width() * 0.33)                  # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
@@ -217,9 +217,9 @@ class SignalStatus_SRR_RR(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.30)                  # Position auf horizontaler Ebene
         y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.35)                  # Boxbreite
+        w = int(parent.width() * 0.33)                  # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
@@ -237,9 +237,9 @@ class SignalStatus_ARS_FRONT(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.30)                  # Position auf horizontaler Ebene
         y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene 
-        w = int(parent.width() * 0.35)                  # Boxbreite
+        w = int(parent.width() * 0.33)                  # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
@@ -257,9 +257,9 @@ class SignalStatus_ARS_REAR(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.31)                  # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.30)                  # Position auf horizontaler Ebene
         y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.35)                  # Boxbreite
+        w = int(parent.width() * 0.33)                  # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
 
@@ -376,9 +376,9 @@ class SensorInformationTable_SRR_FL(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.613)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.33)                   # Boxbreite
+        w = int(parent.width() * 0.415)                   # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
@@ -395,9 +395,9 @@ class SensorInformationTable_SRR_FR(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.613)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.33)                 # Boxbreite
+        w = int(parent.width() * 0.415)                 # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
@@ -415,9 +415,9 @@ class SensorInformationTable_SRR_RL(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.613)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.33)                   # Boxbreite
+        w = int(parent.width() * 0.415)                   # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
@@ -434,9 +434,9 @@ class SensorInformationTable_SRR_RR(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.613)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.33)                 # Boxbreite
+        w = int(parent.width() * 0.415)                 # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
@@ -454,9 +454,9 @@ class SensorInformationTable_ARS_FRONT(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.613)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.1)                  # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.33)                   # Boxbreite
+        w = int(parent.width() * 0.415)                   # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     
@@ -473,9 +473,9 @@ class SensorInformationTable_ARS_REAR(GenericSignalStatus):
 
     def _geometry(self, parent):
         # Position rechts neben Egomotion
-        x = int(parent.width() * 0.66)                   # Position auf horizontaler Ebene
+        x = int(parent.width() * 0.613)                   # Position auf horizontaler Ebene
         y = int(parent.height() * 0.54)                 # Position auf vertikaler Ebene
-        w = int(parent.width() * 0.33)                 # Boxbreite
+        w = int(parent.width() * 0.415)                 # Boxbreite
         h = int(parent.height() * 0.38)                 # Boxhöhe
         return (x, y, w, h)
     

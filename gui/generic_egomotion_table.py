@@ -34,7 +34,7 @@ class GenericEgomotionTable(QFrame):
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Fixed)
 
-        self.table.setGeometry(10, 50, w - 20, h - 60)
+        self.table.setGeometry(0, 50, w - 60, h - 60) # x-Achse, y-Achse, 
 
         # Zeileneinträge
         for i, name in enumerate(row_labels):

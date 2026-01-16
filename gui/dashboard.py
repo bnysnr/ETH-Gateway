@@ -158,16 +158,16 @@ class BaseDashboard(QWidget):
             signal_width = self.signalstatus_boxes[0].table.viewport().width()
             for box in self.signalstatus_boxes:
                 box.table.setColumnWidth(0, int(signal_width * 0.4))
-                box.table.setColumnWidth(1, int(signal_width * 0.2))
-                box.table.setColumnWidth(2, int(signal_width * 0.4))
+                box.table.setColumnWidth(1, int(signal_width * 0.15))
+                box.table.setColumnWidth(2, int(signal_width * 0.45))
         
         # Sensor Information Spalten
         if self.sensor_information_tables:
             sensor_width = self.sensor_information_tables[0].table.viewport().width()
             for table in self.sensor_information_tables:
-                table.table.setColumnWidth(0, int(sensor_width * 0.4))
-                table.table.setColumnWidth(1, int(sensor_width * 0.25))
-                table.table.setColumnWidth(2, int(sensor_width * 0.35))
+                table.table.setColumnWidth(0, int(sensor_width * 0.33))
+                table.table.setColumnWidth(1, int(sensor_width * 0.22))
+                table.table.setColumnWidth(2, int(sensor_width * 0.45))
 
     def showEvent(self, event):
         super().showEvent(event)

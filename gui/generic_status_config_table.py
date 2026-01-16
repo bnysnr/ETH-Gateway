@@ -34,7 +34,7 @@ class GenericSignalStatus(QFrame):
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Fixed)
 
-        self.table.setGeometry(10, 50, w - 20, h - 60)
+        self.table.setGeometry(0, 50, w - 80, h - 60)
 
         # Zeileneinträge
         for i, name in enumerate(row_labels):
