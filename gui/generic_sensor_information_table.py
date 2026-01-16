@@ -21,7 +21,7 @@ class GenericSensorInformationTable(QFrame):
         # Titel
         label = QLabel(title, self, alignment=Qt.AlignHCenter)
         label.setStyleSheet("font-size: 20px; font-weight: bold;")
-        label.setGeometry(0, 15, w, 40)
+        label.setGeometry(0, 15, w - 50, 40)
 
         # Tabelle
         self.table = QTableWidget(len(row_labels), len(columns), self)
