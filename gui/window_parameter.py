@@ -3,7 +3,7 @@
 # Fenster-Einstellungen
 WINDOW_TITLE = "Vehicle Gateway Dashboard"
 WINDOW_WIDTH = 1920    
-WINDOW_HEIGHT = 950
+WINDOW_HEIGHT = 960
 
 # Schriftart
 FONT_PATH = '/home/admin/Desktop/ETH_Gateway/assets/fonts/AUMOVIOOffice-Regular.ttf'
