@@ -1,0 +1,33 @@
+1.
+eth0 Schnittstelle:
+sudo ip addr add 192.168.16.5/24 dev eth0
+
+sudo ip link add link eth0 name eth0.34 type vlan id 34
+sudo ip link set eth0.34 up
+sudo ip addr add 192.168.16.5/24 dev eth0.34
+
+
+2. 
+can0 Schnittstelle aktivieren:
+sudo ip link set can0 type can bitrate 250000
+sudo ip link set up can0
+
+
+______________________________________________________________
+
+Pican Konfiguration
+1. sudo raspi-config
+2. Interface Options --> SPI --> Enble
+3. sudo reboot
+4. sudo nano /boot/firmware/config.txt
+Einfügen:
+dtparam=spi=on
+dtoverlay=mcp2515-can0,oscillator=16000000,interrupt=25,spimaxfrequency=1000000
+dtoverlay=can0
+
+
+5. sudo reboot
+6. ifconfig can0
+7. sudo apt install can-utils -y
+8. candump can0
+

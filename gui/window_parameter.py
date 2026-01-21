@@ -6,11 +6,11 @@ WINDOW_WIDTH = 1920
 WINDOW_HEIGHT = 960
 
 # Schriftart
-FONT_PATH = '/home/admin/Desktop/ETH_Gateway/assets/fonts/AUMOVIOOffice-Regular.ttf'
+FONT_PATH = '/home/admin/ETH-Gateway/assets/fonts/AUMOVIOOffice-Regular.ttf'
 FONT_SIZE = 12
 
 # Bilder
-LOGO_PATH = "/home/admin/Desktop/ETH_Gateway/assets/image/Aumovio_Logo_orange_black_transparent.png"
+LOGO_PATH = "/home/admin/ETH-Gateway/assets/image/Aumovio_Logo_orange_black_transparent.png"
 
 
 # Tabellen-Daten

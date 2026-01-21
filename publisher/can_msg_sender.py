@@ -23,7 +23,7 @@ def get_can_msg_sender():
 class AvailableSensors:
     """Multicast-basierter Radar-IP-Scanner"""
     
-    ALLOWED_IPS = {"192.168.16.12", "192.168.16.13", "192.168.16.14", "192.168.16.15", "192.168.16.16"}
+    ALLOWED_IPS = {"192.168.16.11", "192.168.16.12", "192.168.16.13", "192.168.16.14", "192.168.16.15", "192.168.16.16"}
     MCAST_GRP = '239.22.0.3'
     UDP_PORT = 40000
     INTERFACE_IP = '192.168.16.5'
@@ -156,8 +156,8 @@ class can_msg_sender():
         self.DATA_ID = 0x03E8
         self.E2E_PAYLOAD_LENGTH = 73
 
-        self.DBC_PATH = '/home/admin/Desktop/ETH_Gateway/assets/dbc/J1939_MAN_1.dbc'
-        self.SIGNALS_FILE = '/home/admin/Desktop/ETH_Gateway/assets/signals/required_signals.txt'
+        self.DBC_PATH = '/home/admin/ETH-Gateway/assets/dbc/J1939_MAN_1.dbc'
+        self.SIGNALS_FILE = '/home/admin/ETH-Gateway/assets/signals/required_signals.txt'
         self.CAN_CHANNEL = 'can0'
 
         self.UDP_OUT_IP = "127.0.0.1"     
