@@ -22,8 +22,9 @@ Pican Konfiguration
 4. sudo nano /boot/firmware/config.txt
 Einfügen:
 dtparam=spi=on
-dtoverlay=mcp2515-can0,oscillator=16000000,interrupt=25,spimaxfrequency=1000000
-dtoverlay=can0
+dtoverlay=mcp2515-can0,oscillator=16000000,interrupt=25
+dtoverlay=spi-bcm2835-overlay
+
 
 
 5. sudo reboot

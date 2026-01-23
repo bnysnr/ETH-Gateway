@@ -12,8 +12,7 @@ from publisher.radar_status_reader import radar_status_reader
 from publisher.can_msg_sender import can_msg_sender
 from publisher.sensor_information_reader import SensorInformationReader
 from gui.available_sensors_checker import available_sensors
-import socket
-import struct
+import math
 import time
 
 # Konkrete Dashboard-Implementierungen mit Widget-Imports
@@ -24,6 +23,8 @@ from .widgets import (
     SensorInformationTable_SRR_FL, SensorInformationTable_SRR_FR, SensorInformationTable_SRR_RL, SensorInformationTable_SRR_RR, SensorInformationTable_ARS_FRONT, SensorInformationTable_ARS_REAR
 )
 
+AZIMUTH_ELEVATION_MISALIGNMENT_MIN =  -6 * (math.pi / 180)
+AZIMUTH_ELEVATION_MISALIGNMENT_MAX = 6 * (math.pi / 180)
 
 class BaseDashboard(QWidget):
     """Basis-Klasse für alle Dashboard-Pages mit gemeinsamer Logik"""
@@ -173,13 +174,46 @@ class BaseDashboard(QWidget):
         super().showEvent(event)
         self.resizeEvent(None)
 
+    # SQCQ Funktionen
+    def sqcq_sensor_signal_status(self, sensor_id: str, values: list):
+        """SQCQ for Signal Status"""
+        result = True
+        for val in values:
+            if val == '02':
+                result = False
+                break    
+        print(f"SQCQ Sensor Signal Status for: {sensor_id} - Result: {result}")
+
+    def sqcq_sensor_information_status(self, sensor_id: str, values: list):
+        """SQCQ for Sensor Information"""
+        result = True
+
+        for val in values:
+            if not (
+                val[1] == 3 and
+                AZIMUTH_ELEVATION_MISALIGNMENT_MIN <= val[2] <= AZIMUTH_ELEVATION_MISALIGNMENT_MAX and
+                AZIMUTH_ELEVATION_MISALIGNMENT_MIN <= val[3] <= AZIMUTH_ELEVATION_MISALIGNMENT_MAX and
+                val[4][0] == 1 and
+                val[4][1] == 4 and
+                val[5] > 0 and
+                val[6] is True and
+                val[7] == 'Connected'
+            ):
+                result = False
+                break
+
+        print(f"SQCQ Sensor Information for: {sensor_id} - Result: {result}")
+    
+    
+        
+
     # Update Funktionen
     def update_signal_status_values(self, sensor_id: str, values: list):
         if self.data_binding:
             self.data_binding.update_signal_status_values(sensor_id, values)
+            self.sqcq_sensor_signal_status(sensor_id, values)
 
     def update_egomotion_values(self, sensor_id, values):
-        print(f"[{self.__class__.__name__}] Egomotion Update für {sensor_id}: {values[:3]}...")  # Debug
         if self.data_binding:
             self.data_binding.update_egomotion_values(sensor_id, values)
         else:
@@ -188,6 +222,7 @@ class BaseDashboard(QWidget):
     def update_sensor_information(self, sensor_id: str, values: list):
         if self.data_binding:
             self.data_binding.update_sensor_information_values(sensor_id, values)
+            self.sqcq_sensor_information_status(sensor_id, values)
 
     def distribute_egomotion_data(self, values: list):
         """Empfängt Egomotion-Daten vom zentralen Distributor und verteilt sie an eigene Sensoren"""
