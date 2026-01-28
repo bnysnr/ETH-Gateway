@@ -12,6 +12,7 @@ from publisher.radar_status_reader import radar_status_reader
 from publisher.can_msg_sender import can_msg_sender
 from publisher.sensor_information_reader import SensorInformationReader
 from gui.available_sensors_checker import available_sensors
+
 import math
 import time
 
@@ -406,7 +407,7 @@ class BaseDashboard(QWidget):
 
 
 
-
+ 
 
 class SRR_FRONT(BaseDashboard):
     """Dashboard für Front-Sensoren (FL, FR)"""

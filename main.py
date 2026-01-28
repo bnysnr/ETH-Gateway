@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton
 from PyQt5.QtCore import Qt
 from gui.dashboard import SRR_FRONT, SRR_REAR, ARS_FRONT_REAR, BaseDashboard
+from gui.sqcq_dashboard import SQCQ_DASHBOARD
 from publisher.can_msg_sender import can_msg_sender
 import threading
 import socket
@@ -74,9 +75,10 @@ class MainWindow(QMainWindow):
         
         # Seiten erstellen
         self.pages = [
-            SRR_FRONT(),  # Index 0
-            SRR_REAR(),      # Index 1
-            ARS_FRONT_REAR()       # Index 2
+            SQCQ_DASHBOARD(),       # Index 0
+            SRR_FRONT(),            # Index 1
+            SRR_REAR(),             # Index 2
+            ARS_FRONT_REAR()        # Index 3
         ]
         
         for page in self.pages:
@@ -114,13 +116,14 @@ class MainWindow(QMainWindow):
         main_layout.addLayout(nav_layout)
         
         # Button-Signale verbinden
-        self.btn_srr_front.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
-        self.btn_srr_rear.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(1))
-        self.btn_ars_front_rear.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(2))
+        self.btn_sqcq.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
+        self.btn_srr_front.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(1))
+        self.btn_srr_rear.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(2))
+        self.btn_ars_front_rear.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(3))
         
         # MainWindow-Einstellungen
-        self.setWindowTitle(self.pages[0].windowTitle())
-        self.setFixedSize(self.pages[0].width(), self.pages[0].height() + 50)
+        self.setWindowTitle(self.pages[1].windowTitle())
+        self.setFixedSize(self.pages[1].width(), self.pages[1].height() + 50)
         
         # Egomotion Distributor erstellen
         self.egomotion_distributor = EgomotionDistributor()
