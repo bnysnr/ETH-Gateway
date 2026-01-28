@@ -23,8 +23,10 @@ from .widgets import (
     SensorInformationTable_SRR_FL, SensorInformationTable_SRR_FR, SensorInformationTable_SRR_RL, SensorInformationTable_SRR_RR, SensorInformationTable_ARS_FRONT, SensorInformationTable_ARS_REAR
 )
 
-AZIMUTH_ELEVATION_MISALIGNMENT_MIN =  -6 * (math.pi / 180)
+AZIMUTH_ELEVATION_MISALIGNMENT_MIN = -6 * (math.pi / 180)
 AZIMUTH_ELEVATION_MISALIGNMENT_MAX = 6 * (math.pi / 180)
+AZIMUTH_ELEVATION_OFFSET = -0.2095
+AZIMUTH_ELEVATION_RESOLUTION = 0.0000063935301747158
 
 class BaseDashboard(QWidget):
     """Basis-Klasse für alle Dashboard-Pages mit gemeinsamer Logik"""
@@ -187,21 +189,27 @@ class BaseDashboard(QWidget):
     def sqcq_sensor_information_status(self, sensor_id: str, values: list):
         """SQCQ for Sensor Information"""
         result = True
-
-        for val in values:
+        values[2] = values[2].replace(" ", "")
+        values[3] = values[3].replace(" ", "")
+        values[2] = (int(values[2], 16) * AZIMUTH_ELEVATION_RESOLUTION) + AZIMUTH_ELEVATION_OFFSET
+        values[3] = (int(values[3], 16) * AZIMUTH_ELEVATION_RESOLUTION) + AZIMUTH_ELEVATION_OFFSET
+        values[4] = [int(x) for x in values[4].split()]
+        values[5] = (int(values[5], 16))
+        print(f"DEBUG Signal Information for: {sensor_id} - Values: {values}")
+        for i in range(len(values)):
             if not (
-                val[1] == 3 and
-                AZIMUTH_ELEVATION_MISALIGNMENT_MIN <= val[2] <= AZIMUTH_ELEVATION_MISALIGNMENT_MAX and
-                AZIMUTH_ELEVATION_MISALIGNMENT_MIN <= val[3] <= AZIMUTH_ELEVATION_MISALIGNMENT_MAX and
-                val[4][0] == 1 and
-                val[4][1] == 4 and
-                val[5] > 0 and
-                val[6] is True and
-                val[7] == 'Connected'
+                values[1] == 3 and
+                AZIMUTH_ELEVATION_MISALIGNMENT_MIN <= values[2] <= AZIMUTH_ELEVATION_MISALIGNMENT_MAX and
+                AZIMUTH_ELEVATION_MISALIGNMENT_MIN <= values[3] <= AZIMUTH_ELEVATION_MISALIGNMENT_MAX and
+                values[4][0] == 1 and
+                values[4][1] == 4 and
+                values[5] > 0 and
+                values[6] is True and
+                values[7] == 'Connected'
             ):
                 result = False
                 break
-
+        #print(f"DEBUG SQCQ Sensor Information for: {sensor_id} \n Sensor IOperation Mode: {values[1]} \n Azimuth Missalignment: {values[2]} \n Elevation Missalignment: {values[3]} \n Blockage Status: {values[4]} \n Valid Detectins: {values[5]} \n Calibration: {values[6]} \n Connection to Vehicle: {values[7]} \n")
         print(f"SQCQ Sensor Information for: {sensor_id} - Result: {result}")
     
     
