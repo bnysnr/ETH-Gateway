@@ -93,17 +93,19 @@ class MainWindow(QMainWindow):
         nav_layout.addStretch()
         
         # Navigation-Buttons
-        self.btn_page1 = QPushButton("SRR Front Sensors")
-        self.btn_page2 = QPushButton("SRR Rear Sensors")
-        self.btn_page3 = QPushButton("ARS Sensors")
+        self.btn_sqcq = QPushButton("SQCQ")
+        self.btn_srr_front = QPushButton("SRR Front Sensors")
+        self.btn_srr_rear = QPushButton("SRR Rear Sensors")
+        self.btn_ars_front_rear = QPushButton("ARS Sensors")
         
         button_style = "QPushButton { padding: 8px 15px; font-weight: bold; }"
-        for btn in [self.btn_page1, self.btn_page2, self.btn_page3]:
+        for btn in [self.btn_sqcq, self.btn_srr_front, self.btn_srr_rear, self.btn_ars_front_rear]:
             btn.setStyleSheet(button_style)
         
-        nav_layout.addWidget(self.btn_page1)
-        nav_layout.addWidget(self.btn_page2)
-        nav_layout.addWidget(self.btn_page3)
+        nav_layout.addWidget(self.btn_sqcq)
+        nav_layout.addWidget(self.btn_srr_front)
+        nav_layout.addWidget(self.btn_srr_rear)
+        nav_layout.addWidget(self.btn_ars_front_rear)
         
         # Stretch NACH den Buttons für Zentrierung
         nav_layout.addStretch()
@@ -112,9 +114,9 @@ class MainWindow(QMainWindow):
         main_layout.addLayout(nav_layout)
         
         # Button-Signale verbinden
-        self.btn_page1.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
-        self.btn_page2.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(1))
-        self.btn_page3.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(2))
+        self.btn_srr_front.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
+        self.btn_srr_rear.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(1))
+        self.btn_ars_front_rear.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(2))
         
         # MainWindow-Einstellungen
         self.setWindowTitle(self.pages[0].windowTitle())

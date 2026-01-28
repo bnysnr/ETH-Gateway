@@ -48,6 +48,8 @@ class BaseDashboard(QWidget):
         self.setWindowTitle(WINDOW_TITLE)
         self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
         
+        
+        
         # Widget-Container
         self.egomotion_boxes = []
         self.signalstatus_boxes = []
@@ -176,6 +178,14 @@ class BaseDashboard(QWidget):
         super().showEvent(event)
         self.resizeEvent(None)
 
+    def safe_hex_to_float(self, value: str):
+        try:
+            value = value.replace(" ", "")
+            return (int(value, 16) * AZIMUTH_ELEVATION_RESOLUTION) + AZIMUTH_ELEVATION_OFFSET
+        except (ValueError, AttributeError):
+            return None
+
+
     # SQCQ Funktionen
     def sqcq_sensor_signal_status(self, sensor_id: str, values: list):
         """SQCQ for Signal Status"""
@@ -189,28 +199,50 @@ class BaseDashboard(QWidget):
     def sqcq_sensor_information_status(self, sensor_id: str, values: list):
         """SQCQ for Sensor Information"""
         result = True
-        values[2] = values[2].replace(" ", "")
-        values[3] = values[3].replace(" ", "")
-        values[2] = (int(values[2], 16) * AZIMUTH_ELEVATION_RESOLUTION) + AZIMUTH_ELEVATION_OFFSET
-        values[3] = (int(values[3], 16) * AZIMUTH_ELEVATION_RESOLUTION) + AZIMUTH_ELEVATION_OFFSET
-        values[4] = [int(x) for x in values[4].split()]
-        values[5] = (int(values[5], 16))
+
+        # Azimuth / Elevation sicher konvertieren
+        azimuth = self.safe_hex_to_float(values[2])
+        elevation = self.safe_hex_to_float(values[3])
+
+        # Wenn keine gültigen Werte → sofort False
+        if azimuth is None or elevation is None:
+            print(f"DEBUG Sensor {sensor_id}: Invalid Azimuth/Elevation ({values[2]}, {values[3]})")
+            print(f"SQCQ Sensor Information for: {sensor_id} - Result: False")
+            return
+
+        values[2] = azimuth
+        values[3] = elevation
+
+        # Blockage Status
+        try:
+            values[4] = [int(x) for x in values[4].split()]
+        except Exception:
+            print(f"DEBUG Sensor {sensor_id}: Invalid Blockage Status ({values[4]})")
+            result = False
+
+        # Valid Detections
+        try:
+            values[5] = int(values[5], 16)
+        except Exception:
+            result = False
+
         print(f"DEBUG Signal Information for: {sensor_id} - Values: {values}")
-        for i in range(len(values)):
-            if not (
-                values[1] == 3 and
-                AZIMUTH_ELEVATION_MISALIGNMENT_MIN <= values[2] <= AZIMUTH_ELEVATION_MISALIGNMENT_MAX and
-                AZIMUTH_ELEVATION_MISALIGNMENT_MIN <= values[3] <= AZIMUTH_ELEVATION_MISALIGNMENT_MAX and
-                values[4][0] == 1 and
-                values[4][1] == 4 and
-                values[5] > 0 and
-                values[6] is True and
-                values[7] == 'Connected'
-            ):
-                result = False
-                break
-        #print(f"DEBUG SQCQ Sensor Information for: {sensor_id} \n Sensor IOperation Mode: {values[1]} \n Azimuth Missalignment: {values[2]} \n Elevation Missalignment: {values[3]} \n Blockage Status: {values[4]} \n Valid Detectins: {values[5]} \n Calibration: {values[6]} \n Connection to Vehicle: {values[7]} \n")
+
+        if not (
+            values[1] == 3 and
+            AZIMUTH_ELEVATION_MISALIGNMENT_MIN <= values[2] <= AZIMUTH_ELEVATION_MISALIGNMENT_MAX and
+            AZIMUTH_ELEVATION_MISALIGNMENT_MIN <= values[3] <= AZIMUTH_ELEVATION_MISALIGNMENT_MAX and
+            len(values[4]) >= 2 and
+            values[4][0] == 1 and
+            values[4][1] == 4 and
+            values[5] > 0 and
+            values[6] is True and
+            values[7] == 'Connected'
+        ):
+            result = False
+
         print(f"SQCQ Sensor Information for: {sensor_id} - Result: {result}")
+
     
     
         
