@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton
 from PyQt5.QtCore import Qt
-from gui.dashboard import Dashboard, Page2, Page3, BaseDashboard
+from gui.dashboard import SRR_FRONT, SRR_REAR, ARS_FRONT_REAR, BaseDashboard
 from publisher.can_msg_sender import can_msg_sender
 import threading
 import socket
@@ -74,9 +74,9 @@ class MainWindow(QMainWindow):
         
         # Seiten erstellen
         self.pages = [
-            Dashboard(),  # Index 0
-            Page2(),      # Index 1
-            Page3()       # Index 2
+            SRR_FRONT(),  # Index 0
+            SRR_REAR(),      # Index 1
+            ARS_FRONT_REAR()       # Index 2
         ]
         
         for page in self.pages:

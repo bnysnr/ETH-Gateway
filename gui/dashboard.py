@@ -408,7 +408,7 @@ class BaseDashboard(QWidget):
 
 
 
-class Dashboard(BaseDashboard):
+class SRR_FRONT(BaseDashboard):
     """Dashboard für Front-Sensoren (FL, FR)"""
     def __init__(self):
         config = {
@@ -426,7 +426,7 @@ class Dashboard(BaseDashboard):
         super().__init__(config)
 
 
-class Page2(BaseDashboard):
+class SRR_REAR(BaseDashboard):
     """Dashboard für Rear-Sensoren (RL, RR)"""
     def __init__(self):
         config = {
@@ -444,7 +444,7 @@ class Page2(BaseDashboard):
         super().__init__(config)
 
 
-class Page3(BaseDashboard):
+class ARS_FRONT_REAR(BaseDashboard):
     """Dashboard für ARS Sensoren"""
     def __init__(self):
         config = {
