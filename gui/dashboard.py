@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QTableWidgetItem
 from PyQt5.QtCore import pyqtSignal
 from .window_parameter import (
     WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT,
@@ -12,6 +12,9 @@ from publisher.radar_status_reader import radar_status_reader
 from publisher.can_msg_sender import can_msg_sender
 from publisher.sensor_information_reader import SensorInformationReader
 from gui.available_sensors_checker import available_sensors
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
 
 import math
 import time
@@ -29,6 +32,19 @@ AZIMUTH_ELEVATION_MISALIGNMENT_MIN = -6 * (math.pi / 180)
 AZIMUTH_ELEVATION_MISALIGNMENT_MAX = 6 * (math.pi / 180)
 AZIMUTH_ELEVATION_OFFSET = -0.2095
 AZIMUTH_ELEVATION_RESOLUTION = 0.0000063935301747158
+
+# Globale Referenz für SQCQ Dashboard
+_sqcq_dashboard_instance = None
+
+def set_sqcq_dashboard(instance):
+    """Setzt die globale SQCQ Dashboard Referenz"""
+    global _sqcq_dashboard_instance
+    _sqcq_dashboard_instance = instance
+
+def get_sqcq_dashboard():
+    """Holt die globale SQCQ Dashboard Referenz"""
+    return _sqcq_dashboard_instance
+
 
 class BaseDashboard(QWidget):
     """Basis-Klasse für alle Dashboard-Pages mit gemeinsamer Logik"""
@@ -69,6 +85,8 @@ class BaseDashboard(QWidget):
         self.sensor_information_obj = SensorInformationReader()
         self.available_sensors_checker_obj = available_sensors()
         self.available_sensors_checker_obj.start()
+
+
         
         # Thread Flag
         self.thread_running = True
@@ -191,13 +209,21 @@ class BaseDashboard(QWidget):
 
     # SQCQ Funktionen
     def sqcq_sensor_signal_status(self, sensor_id: str, values: list):
-        """SQCQ for Signal Status"""
+        """SQCQ for Signal Status - sendet an globales SQCQ Dashboard"""
         result = True
         for val in values:
             if val == '02':
                 result = False
                 break    
         print(f"SQCQ Sensor Signal Status for: {sensor_id} - Result: {result}")
+        
+        # Sende an globales SQCQ Dashboard
+        sqcq_dashboard = get_sqcq_dashboard()
+        if sqcq_dashboard:
+            sqcq_dashboard._fill_test_data(sensor_id, result)
+        else:
+            print("WARNING: SQCQ Dashboard nicht verfügbar!")
+        
 
     def sqcq_sensor_information_status(self, sensor_id: str, values: list):
         """SQCQ for Sensor Information"""
@@ -211,6 +237,11 @@ class BaseDashboard(QWidget):
         if azimuth is None or elevation is None:
             print(f"DEBUG Sensor {sensor_id}: Invalid Azimuth/Elevation ({values[2]}, {values[3]})")
             print(f"SQCQ Sensor Information for: {sensor_id} - Result: False")
+            result = False
+            # Sende trotzdem an SQCQ Dashboard
+            sqcq_dashboard = get_sqcq_dashboard()
+            if sqcq_dashboard:
+                sqcq_dashboard._fill_sensor_information_data(sensor_id, result)
             return
 
         values[2] = azimuth
@@ -229,8 +260,6 @@ class BaseDashboard(QWidget):
         except Exception:
             result = False
 
-        print(f"DEBUG Signal Information for: {sensor_id} - Values: {values}")
-
         if not (
             values[1] == 3 and
             AZIMUTH_ELEVATION_MISALIGNMENT_MIN <= values[2] <= AZIMUTH_ELEVATION_MISALIGNMENT_MAX and
@@ -245,9 +274,13 @@ class BaseDashboard(QWidget):
             result = False
 
         print(f"SQCQ Sensor Information for: {sensor_id} - Result: {result}")
-
-    
-    
+        
+        # Sende an globales SQCQ Dashboard
+        sqcq_dashboard = get_sqcq_dashboard()
+        if sqcq_dashboard:
+            sqcq_dashboard._fill_sensor_information_data(sensor_id, result)
+        else:
+            print("WARNING: SQCQ Dashboard nicht verfügbar!")
         
 
     # Update Funktionen
@@ -281,9 +314,6 @@ class BaseDashboard(QWidget):
             if not_available_sensor_ip in self.sensor_config['sensors'].values():
                 self.egomotion_values_updated.emit(not_available_sensor_ip, EGOMOTION_DEFAULT_VALUES)
 
-    def update_egomotion_value_thread(self):
-        """DEPRECATED - Wird nicht mehr verwendet, da zentral verwaltet"""
-        pass
 
     def update_radar_status_thread(self):
         """Thread für Radar-Status-Updates"""
@@ -470,7 +500,14 @@ class SQCQ_DASHBOARD(BaseDashboard):
 
     def __init__(self):
         config = {
-            'sensors': {},  
+            'sensors': {
+                'srr_fl': "192.168.16.12",
+                'srr_fr': "192.168.16.13",
+                'srr_rl': "192.168.16.14",
+                'srr_rr': "192.168.16.15",
+                'ars_front': "192.168.16.11",
+                'ars_rear': "192.168.16.16"
+            },  
             'widget_classes': {
                 'sqcq': [SQCQ],
                 'egomotion': [],
@@ -480,40 +517,131 @@ class SQCQ_DASHBOARD(BaseDashboard):
             }
         }
         super().__init__(config)
-
-    # ==============================
-    # Überschreibungen
-    # ==============================
+        
+        # Mapping: IP -> Tabellenzeile
+        self.ip_to_row = {
+            "192.168.16.12": 0,  # SRR Front Left
+            "192.168.16.13": 1,  # SRR Front Right
+            "192.168.16.14": 2,  # SRR Rear Left
+            "192.168.16.15": 3,  # SRR Rear Right
+            "192.168.16.11": 4,  # ARS Front
+            "192.168.16.16": 5   # ARS Rear
+        }
+        
+        # Registriere diese Instanz als globales SQCQ Dashboard
+        set_sqcq_dashboard(self)
 
     def _create_widgets(self):
         """Nur TitleBox + SQCQ Tabelle"""
         self.title_box = TitleBox(self, self.gui_font)
-
         self.egomotion_boxes = []
         self.signalstatus_boxes = []
         self.checkboxes = []
         self.sensor_information_tables = []
-
-        # SQCQ Table
         self.sqcq_table = SQCQ(self, self.gui_font)
 
-
     def _setup_data_binding(self):
-        """Kein DataBinding für SQCQ"""
+        """Kein Data Binding nötig"""
         self.data_binding = None
 
+    def _fill_test_data(self, sensor_id, values):
+        """Füllt Tabelle mit Werten basierend auf Sensor IP"""
+        print(f"[SQCQ_DASHBOARD] _fill_test_data aufgerufen - Sensor ID: {sensor_id} - Values: {values}")
+        
+        # Prüfe ob sqcq_table existiert
+        if not hasattr(self, 'sqcq_table'):
+            print("ERROR: sqcq_table existiert nicht!")
+            return
+        
+        if not hasattr(self.sqcq_table, 'table'):
+            print("ERROR: sqcq_table.table existiert nicht!")
+            return
+        
+        # Hole die entsprechende Zeile für die IP
+        if sensor_id not in self.ip_to_row:
+            print(f"WARNING: Unknown sensor IP {sensor_id}")
+            return
+        
+        row = self.ip_to_row[sensor_id]
+        print(f"Schreibe in Zeile {row}, Spalte 1")
+        
+        # Erstelle QTableWidgetItem mit dem Wert
+        item = QTableWidgetItem(str(values))
+        
+        # Setze Hintergrundfarbe basierend auf Wert
+        if values is True:
+            item.setForeground(QColor('green'))  # Grün für True
+        else:
+            item.setForeground(QColor('red'))  # Rot für False
+        
+        # Zentriere den Text
+        item.setTextAlignment(Qt.AlignCenter)
+        
+        # Schreibe in die Tabelle (Zeile basierend auf IP, Spalte 1)
+        self.sqcq_table.table.setItem(row, 1, item)
+        print(f"Wert '{values}' erfolgreich in Zeile {row}, Spalte 1 geschrieben")
+
+    def _fill_sensor_information_data(self, sensor_id, values):
+        """Füllt Tabelle mit Sensor Information Werten in Spalte 2"""
+        print(f"[SQCQ_DASHBOARD] _fill_sensor_information_data aufgerufen - Sensor ID: {sensor_id} - Values: {values}")
+        
+        # Prüfe ob sqcq_table existiert
+        if not hasattr(self, 'sqcq_table'):
+            print("ERROR: sqcq_table existiert nicht!")
+            return
+        
+        if not hasattr(self.sqcq_table, 'table'):
+            print("ERROR: sqcq_table.table existiert nicht!")
+            return
+        
+        # Hole die entsprechende Zeile für die IP
+        if sensor_id not in self.ip_to_row:
+            print(f"WARNING: Unknown sensor IP {sensor_id}")
+            return
+        
+        row = self.ip_to_row[sensor_id]
+        print(f"Schreibe in Zeile {row}, Spalte 2")
+        
+        # Erstelle QTableWidgetItem mit dem Wert
+        item = QTableWidgetItem(str(values))
+        
+        # Setze Hintergrundfarbe basierend auf Wert
+        if values is True:
+            item.setForeground(QColor('green'))  
+        else:
+            item.setForeground(QColor('red'))  # Rot für False
+        
+        # Zentriere den Text
+        item.setTextAlignment(Qt.AlignCenter)
+        
+        # Schreibe in die Tabelle (Zeile basierend auf IP, Spalte 2)
+        self.sqcq_table.table.setItem(row, 2, item)
+        print(f"Wert '{values}' erfolgreich in Zeile {row}, Spalte 2 geschrieben")
+    
+    def sqcq_sensor_signal_status(self, sensor_id: str, values: list):
+        """Überschreibe die Methode - nicht nötig für SQCQ Dashboard"""
+        pass
+
+    def sqcq_sensor_information_status(self, sensor_id: str, values: list):
+        """Überschreibe die Methode - nicht nötig für SQCQ Dashboard"""
+        pass
+
     def update_radar_status_thread(self):
-        """Kein Radar-Thread"""
+        """Überschreibe die Methode - nicht nötig für SQCQ Dashboard"""
         pass
 
     def update_radar_signal_information_thread(self):
-        """Kein Sensor-Information-Thread"""
+        """Überschreibe die Methode - nicht nötig für SQCQ Dashboard"""
         pass
 
     def distribute_egomotion_data(self, values: list):
-        """Keine Egomotion-Verteilung"""
+        """Überschreibe die Methode - nicht nötig für SQCQ Dashboard"""
         pass
-
-
-        
-
+    
+    def closeEvent(self, event):
+        """Cleanup beim Schließen"""
+        # Entferne globale Referenz
+        global _sqcq_dashboard_instance
+        if _sqcq_dashboard_instance == self:
+            _sqcq_dashboard_instance = None
+        super().closeEvent(event)
