@@ -83,6 +83,11 @@ class MainWindow(QMainWindow):
         for page in self.pages:
             self.stacked_widget.addWidget(page)
         
+
+        # Fenstergrößen definieren
+        self.SIZE_SQCQ = (750, 450)
+        self.SIZE_SENSORS = (1820, 880)
+
         main_layout.addWidget(self.stacked_widget)
         
         # Navigation-Bar UNTEN
@@ -121,14 +126,30 @@ class MainWindow(QMainWindow):
         self.btn_ars_front_rear.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(3))
         
         # MainWindow-Einstellungen
-        self.setWindowTitle(self.pages[1].windowTitle())
-        self.setFixedSize(self.pages[1].width(), self.pages[1].height() + 50)
+        #self.setWindowTitle(self.pages[1].windowTitle())
+        #self.setFixedSize(self.pages[1].width(), self.pages[1].height() + 50)
         
+        self.stacked_widget.currentChanged.connect(self.on_page_changed)
+
+
+        # Startseite
+        self.on_page_changed(0)
+        self.stacked_widget.setCurrentIndex(0)
+
+
+
         # Egomotion Distributor erstellen
         self.egomotion_distributor = EgomotionDistributor()
         
         # Threads initialisieren
         self._start_threads()
+
+
+    def on_page_changed(self, index):
+        if index == 0:
+            self.resize(*self.SIZE_SQCQ)
+        else:
+            self.resize(*self.SIZE_SENSORS)
 
     def _start_threads(self):
         """Startet alle Threads für alle Dashboard-Seiten"""

@@ -64,7 +64,7 @@ class BaseDashboard(QWidget):
         
         # Fenster Einstellungen
         self.setWindowTitle(WINDOW_TITLE)
-        self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
+        #self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
         
         
         
@@ -197,7 +197,7 @@ class BaseDashboard(QWidget):
 
     def showEvent(self, event):
         super().showEvent(event)
-        self.resizeEvent(None)
+        self.update()
 
     def safe_hex_to_float(self, value: str):
         try:
