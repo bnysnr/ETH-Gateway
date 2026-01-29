@@ -210,10 +210,10 @@ class BaseDashboard(QWidget):
     # SQCQ Funktionen
     def sqcq_sensor_signal_status(self, sensor_id: str, values: list):
         """SQCQ for Signal Status - sendet an globales SQCQ Dashboard"""
-        result = True
+        result = "Valid"
         for val in values:
             if val == '02':
-                result = False
+                result = "Invalid"
                 break    
         print(f"SQCQ Sensor Signal Status for: {sensor_id} - Result: {result}")
         
@@ -227,7 +227,7 @@ class BaseDashboard(QWidget):
 
     def sqcq_sensor_information_status(self, sensor_id: str, values: list):
         """SQCQ for Sensor Information"""
-        result = True
+        result = "Valid"
 
         # Azimuth / Elevation sicher konvertieren
         azimuth = self.safe_hex_to_float(values[2])
@@ -236,8 +236,8 @@ class BaseDashboard(QWidget):
         # Wenn keine gültigen Werte → sofort False
         if azimuth is None or elevation is None:
             print(f"DEBUG Sensor {sensor_id}: Invalid Azimuth/Elevation ({values[2]}, {values[3]})")
-            print(f"SQCQ Sensor Information for: {sensor_id} - Result: False")
-            result = False
+            print(f"SQCQ Sensor Information for: {sensor_id} - Result: {result}")
+            result = "Invalid"
             # Sende trotzdem an SQCQ Dashboard
             sqcq_dashboard = get_sqcq_dashboard()
             if sqcq_dashboard:
@@ -252,13 +252,13 @@ class BaseDashboard(QWidget):
             values[4] = [int(x) for x in values[4].split()]
         except Exception:
             print(f"DEBUG Sensor {sensor_id}: Invalid Blockage Status ({values[4]})")
-            result = False
+            result = "Invalid"
 
         # Valid Detections
         try:
             values[5] = int(values[5], 16)
         except Exception:
-            result = False
+            result = "Invalid"
 
         if not (
             values[1] == 3 and
@@ -271,7 +271,7 @@ class BaseDashboard(QWidget):
             values[6] is True and
             values[7] == 'Connected'
         ):
-            result = False
+            result = "Invalid"
 
         print(f"SQCQ Sensor Information for: {sensor_id} - Result: {result}")
         
@@ -546,7 +546,7 @@ class SQCQ_DASHBOARD(BaseDashboard):
 
     def _fill_test_data(self, sensor_id, values):
         """Füllt Tabelle mit Werten basierend auf Sensor IP"""
-        print(f"[SQCQ_DASHBOARD] _fill_test_data aufgerufen - Sensor ID: {sensor_id} - Values: {values}")
+    
         
         # Prüfe ob sqcq_table existiert
         if not hasattr(self, 'sqcq_table'):
@@ -563,13 +563,13 @@ class SQCQ_DASHBOARD(BaseDashboard):
             return
         
         row = self.ip_to_row[sensor_id]
-        print(f"Schreibe in Zeile {row}, Spalte 1")
+    
         
         # Erstelle QTableWidgetItem mit dem Wert
         item = QTableWidgetItem(str(values))
         
         # Setze Hintergrundfarbe basierend auf Wert
-        if values is True:
+        if values is "Valid":
             item.setForeground(QColor('green'))  # Grün für True
         else:
             item.setForeground(QColor('red'))  # Rot für False
@@ -583,7 +583,7 @@ class SQCQ_DASHBOARD(BaseDashboard):
 
     def _fill_sensor_information_data(self, sensor_id, values):
         """Füllt Tabelle mit Sensor Information Werten in Spalte 2"""
-        print(f"[SQCQ_DASHBOARD] _fill_sensor_information_data aufgerufen - Sensor ID: {sensor_id} - Values: {values}")
+    
         
         # Prüfe ob sqcq_table existiert
         if not hasattr(self, 'sqcq_table'):
@@ -600,13 +600,12 @@ class SQCQ_DASHBOARD(BaseDashboard):
             return
         
         row = self.ip_to_row[sensor_id]
-        print(f"Schreibe in Zeile {row}, Spalte 2")
         
         # Erstelle QTableWidgetItem mit dem Wert
         item = QTableWidgetItem(str(values))
         
         # Setze Hintergrundfarbe basierend auf Wert
-        if values is True:
+        if values is "Valid":
             item.setForeground(QColor('green'))  
         else:
             item.setForeground(QColor('red'))  # Rot für False
@@ -616,7 +615,6 @@ class SQCQ_DASHBOARD(BaseDashboard):
         
         # Schreibe in die Tabelle (Zeile basierend auf IP, Spalte 2)
         self.sqcq_table.table.setItem(row, 2, item)
-        print(f"Wert '{values}' erfolgreich in Zeile {row}, Spalte 2 geschrieben")
     
     def sqcq_sensor_signal_status(self, sensor_id: str, values: list):
         """Überschreibe die Methode - nicht nötig für SQCQ Dashboard"""
