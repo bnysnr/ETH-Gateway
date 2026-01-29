@@ -4,7 +4,7 @@
 from PyQt5.QtWidgets import QFrame, QLabel, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView, QCheckBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from .window_parameter import LOGO_PATH, EGO_SIGNALS, SENSOR_CONFIG_SIGNALS, SENSOR_SIGNAL_INFORMATION
+from .window_parameter import LOGO_PATH, EGO_SIGNALS, SENSOR_CONFIG_SIGNALS, SENSOR_SIGNAL_INFORMATION, SQCQ_SENSOR_NAMES
 from .functions import apply_font_to_table, create_table_item
 from .generic_egomotion_table import GenericEgomotionTable
 from .generic_status_config_table import GenericSignalStatus
@@ -36,6 +36,38 @@ class TitleBox(QFrame):
         title_label.setGeometry(0, 0, parent.width(), box_height)
 
 
+class SQCQ(GenericEgomotionTable):
+    """SQCQ Dashboard Tabellenkonfiguration"""
+    def __init__(self, parent, gui_font):
+        super().__init__(
+            parent,
+            gui_font,
+            title="SQCQ Dashboard",
+            row_labels=SQCQ_SENSOR_NAMES,
+            columns=["Sensor", "Sensor Message Status", "Sensor Information"],
+            geometry_func=self._geometry
+        )
+
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Fixed)
+
+        self._update_column_widths()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._update_column_widths()
+
+    def _update_column_widths(self):
+        width = self.table.viewport().width()
+        self.table.setColumnWidth(0, int(width * 0.25))  # Sensor
+        self.table.setColumnWidth(1, int(width * 0.35))  # Status
+        self.table.setColumnWidth(2, int(width * 0.40))  # Info
+
+    def _geometry(self, parent):
+        box_y = int(parent.height() * 0.1)          # Position auf der vertikalen Ebene
+        box_h = int(parent.height() * 0.30)         # Position auf der horizontalen Ebene 
+        box_w = int(parent.width() * 0.45)          # Boxbreite
+        return (20, box_y, box_w, box_h)            # Abstand zum linken Rand: 20
 
 class Egomotion_SRR_FL(GenericEgomotionTable):
     def __init__(self, parent, gui_font):

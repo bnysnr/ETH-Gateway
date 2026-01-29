@@ -1,8 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QWidget, QVBoxLayout, QHBoxLayout, QPushButton
 from PyQt5.QtCore import Qt
-from gui.dashboard import SRR_FRONT, SRR_REAR, ARS_FRONT_REAR, BaseDashboard
-from gui.sqcq_dashboard import SQCQ_DASHBOARD
+from gui.dashboard import SQCQ_DASHBOARD, SRR_FRONT, SRR_REAR, ARS_FRONT_REAR, BaseDashboard
 from publisher.can_msg_sender import can_msg_sender
 import threading
 import socket

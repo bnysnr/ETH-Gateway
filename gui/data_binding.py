@@ -20,6 +20,7 @@ class DataBinding:
         sensor_information_tables: dict,
         gui_font
     ):
+
         self.sensor_config_tables = sensor_config_tables        # dict[str, QTableWidget]
         self.egomotion_tables = egomotion_tables                # dict[str, QTableWidget]
         self.sensor_information_tables = sensor_information_tables  # dict[str, QTableWidget]

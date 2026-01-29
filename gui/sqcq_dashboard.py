@@ -1,69 +1,47 @@
-import sys
 from PyQt5.QtWidgets import (
-    QApplication,
     QMainWindow,
     QWidget,
     QVBoxLayout,
-    QTableWidget,
-    QTableWidgetItem
+    QTableWidget
 )
-from PyQt5.QtCore import Qt
-from .window_parameter import (
+
+from gui.window_parameter import (
     WINDOW_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT
 )
 
+
 class SQCQ_DASHBOARD(QMainWindow):
-    def __init__(self):
+    def __init__(self, font=None, title=None):
         super().__init__()
 
-        self.setWindowTitle("SQCQ Dashboard")
+        self.font = font
+        self.title = title or WINDOW_TITLE
 
-        central_widget = QWidget()
+        # Fenster-Einstellungen
+        self.setWindowTitle(self.title)
+        self.resize(WINDOW_WIDTH, WINDOW_HEIGHT)
+
+        central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
 
         layout = QVBoxLayout(central_widget)
 
         self.table = QTableWidget()
-        self.table.setColumnCount(5)
+        self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels([
-            "Sensor ID",
-            "Operation Mode",
-            "Azimuth",
-            "Elevation",
-            "Connection"
+            "Sensor",
+            "Sensor Config Message Status",
+            "Sensor Information"
         ])
 
         layout.addWidget(self.table)
 
-        #self.load_example_data()
-
-        # 🔥 WICHTIG: erst NACH dem Befüllen
+        # Nach dem Befüllen sinnvoll
         self.table.resizeColumnsToContents()
         self.table.resizeRowsToContents()
 
-        self.adjustSize()   # ⬅️ Fenster passt sich Tabelle an
-
-
-
-    def load_example_data(self):
-        data = [
-            ("192.168.16.12", "8", "-0.000003", "-0.000003", "Connected"),
-            ("192.168.16.13", "8", "0.000001", "0.000002", "Connected"),
-            ("192.168.16.15", "-", "-", "-", "NO CONNECTION"),
-        ]
-
-        self.table.setRowCount(len(data))
-
-        for row, row_data in enumerate(data):
-            for col, value in enumerate(row_data):
-                item = QTableWidgetItem(value)
-                item.setTextAlignment(Qt.AlignCenter)
-                self.table.setItem(row, col, item)
-"""
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = SQCQ_DASHBOARD()
-    window.show()
-    sys.exit(app.exec_())
-"""
+    def geometry_from_parent(self, parent):
+        box_y = int(parent.height() * 0.1)
+        box_h = int(parent.height() * 0.38)
+        box_w = int(parent.width() * 0.3)
+        return (20, box_y, box_w, box_h)

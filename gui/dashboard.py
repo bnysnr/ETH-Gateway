@@ -18,6 +18,7 @@ import time
 
 # Konkrete Dashboard-Implementierungen mit Widget-Imports
 from .widgets import (
+    SQCQ,
     Egomotion_SRR_FL, Egomotion_SRR_FR, Egomotion_SRR_RL, Egomotion_SRR_RR, Egomotion_ARS_FRONT, Egomotion_ARS_REAR,
     SignalStatus_SRR_FL, SignalStatus_SRR_FR, SignalStatus_SRR_RL, SignalStatus_SRR_RR, SignalStatus_ARS_FRONT, SignalStatus_ARS_REAR,
     Pointcloud_SRR_FL, Pointcloud_SRR_FR, Pointcloud_SRR_RL, Pointcloud_SRR_RR, Pointcloud_ARS_FRONT, Pointcloud_ARS_REAR, 
@@ -82,7 +83,8 @@ class BaseDashboard(QWidget):
         self.title_box = TitleBox(self, self.gui_font)
         
         widget_classes = self.sensor_config['widget_classes']
-        
+
+
         # Egomotion Widgets
         for widget_class in widget_classes['egomotion']:
             widget = widget_class(self, self.gui_font)
@@ -461,4 +463,57 @@ class ARS_FRONT_REAR(BaseDashboard):
             }
         }
         super().__init__(config)
+
+
+class SQCQ_DASHBOARD(BaseDashboard):
+    """Dashboard fürs SQCQ (nur Logo + eine Tabelle)"""
+
+    def __init__(self):
+        config = {
+            'sensors': {},  
+            'widget_classes': {
+                'sqcq': [SQCQ],
+                'egomotion': [],
+                'signal_status': [],
+                'pointcloud': [],
+                'sensor_info': []
+            }
+        }
+        super().__init__(config)
+
+    # ==============================
+    # Überschreibungen
+    # ==============================
+
+    def _create_widgets(self):
+        """Nur TitleBox + SQCQ Tabelle"""
+        self.title_box = TitleBox(self, self.gui_font)
+
+        self.egomotion_boxes = []
+        self.signalstatus_boxes = []
+        self.checkboxes = []
+        self.sensor_information_tables = []
+
+        # SQCQ Table
+        self.sqcq_table = SQCQ(self, self.gui_font)
+
+
+    def _setup_data_binding(self):
+        """Kein DataBinding für SQCQ"""
+        self.data_binding = None
+
+    def update_radar_status_thread(self):
+        """Kein Radar-Thread"""
+        pass
+
+    def update_radar_signal_information_thread(self):
+        """Kein Sensor-Information-Thread"""
+        pass
+
+    def distribute_egomotion_data(self, values: list):
+        """Keine Egomotion-Verteilung"""
+        pass
+
+
+        
 

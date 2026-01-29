@@ -13,6 +13,16 @@ FONT_SIZE = 12
 LOGO_PATH = "/home/admin/ETH-Gateway/assets/image/Aumovio_Logo_orange_black_transparent.png"
 
 
+# SQCQ Sensorenbezeichnung
+SQCQ_SENSOR_NAMES = [
+    "SRR Front Left",
+    "SRR Front Right",
+    "SRR Rear Left",
+    "SRR Rear Right",
+    "ARS Front",
+    "ARS Rear"
+]
+
 # Tabellen-Daten
 EGO_SIGNALS = [
     "Yaw Rate", 
