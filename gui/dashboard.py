@@ -191,9 +191,9 @@ class BaseDashboard(QWidget):
         if self.sensor_information_tables:
             sensor_width = self.sensor_information_tables[0].table.viewport().width()
             for table in self.sensor_information_tables:
-                table.table.setColumnWidth(0, int(sensor_width * 0.38))
-                table.table.setColumnWidth(1, int(sensor_width * 0.22))
-                table.table.setColumnWidth(2, int(sensor_width * 0.40))
+                table.table.setColumnWidth(0, int(sensor_width * 0.34))
+                table.table.setColumnWidth(1, int(sensor_width * 0.23))
+                table.table.setColumnWidth(2, int(sensor_width * 0.43))
 
     def showEvent(self, event):
         super().showEvent(event)
