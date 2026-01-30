@@ -85,7 +85,7 @@ class MainWindow(QMainWindow):
         
 
         # Fenstergrößen definieren
-        self.SIZE_SQCQ = (750, 450)
+        self.SIZE_SQCQ = (750, 400)
         self.SIZE_SENSORS = (1820, 880)
 
         main_layout.addWidget(self.stacked_widget)

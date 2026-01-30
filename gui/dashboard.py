@@ -191,9 +191,9 @@ class BaseDashboard(QWidget):
         if self.sensor_information_tables:
             sensor_width = self.sensor_information_tables[0].table.viewport().width()
             for table in self.sensor_information_tables:
-                table.table.setColumnWidth(0, int(sensor_width * 0.33))
+                table.table.setColumnWidth(0, int(sensor_width * 0.38))
                 table.table.setColumnWidth(1, int(sensor_width * 0.22))
-                table.table.setColumnWidth(2, int(sensor_width * 0.45))
+                table.table.setColumnWidth(2, int(sensor_width * 0.40))
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -452,7 +452,7 @@ class SRR_FRONT(BaseDashboard):
             'widget_classes': {
                 'egomotion': [Egomotion_SRR_FL, Egomotion_SRR_FR],
                 'signal_status': [SignalStatus_SRR_FL, SignalStatus_SRR_FR],
-                'pointcloud': [Pointcloud_SRR_FL, Pointcloud_SRR_FR],
+                'pointcloud': [],                                                               # [Pointcloud_SRR_FL, Pointcloud_SRR_FR],
                 'sensor_info': [SensorInformationTable_SRR_FL, SensorInformationTable_SRR_FR]
             }
         }
@@ -470,7 +470,7 @@ class SRR_REAR(BaseDashboard):
             'widget_classes': {
                 'egomotion': [Egomotion_SRR_RL, Egomotion_SRR_RR],
                 'signal_status': [SignalStatus_SRR_RL, SignalStatus_SRR_RR],
-                'pointcloud': [Pointcloud_SRR_RL, Pointcloud_SRR_RR],
+                'pointcloud': [],                                                               # [Pointcloud_SRR_RL, Pointcloud_SRR_RR],
                 'sensor_info': [SensorInformationTable_SRR_RL, SensorInformationTable_SRR_RR]
             }
         }
@@ -488,7 +488,7 @@ class ARS_FRONT_REAR(BaseDashboard):
             'widget_classes': {
                 'egomotion': [Egomotion_ARS_FRONT, Egomotion_ARS_REAR],
                 'signal_status': [SignalStatus_ARS_FRONT, SignalStatus_ARS_REAR],
-                'pointcloud': [Pointcloud_ARS_FRONT, Pointcloud_ARS_REAR],
+                'pointcloud': [],                                                           # [Pointcloud_ARS_FRONT, Pointcloud_ARS_REAR],
                 'sensor_info': [SensorInformationTable_ARS_FRONT, SensorInformationTable_ARS_REAR]
             }
         }
