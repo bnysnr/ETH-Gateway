@@ -215,7 +215,7 @@ class BaseDashboard(QWidget):
             if val == '02':
                 result = "Invalid"
                 break    
-        print(f"SQCQ Sensor Signal Status for: {sensor_id} - Result: {result}")
+        #print(f"SQCQ Sensor Signal Status for: {sensor_id} - Result: {result}")
         
         # Sende an globales SQCQ Dashboard
         sqcq_dashboard = get_sqcq_dashboard()
@@ -235,13 +235,14 @@ class BaseDashboard(QWidget):
 
         # Wenn keine gültigen Werte → sofort False
         if azimuth is None or elevation is None:
-            print(f"DEBUG Sensor {sensor_id}: Invalid Azimuth/Elevation ({values[2]}, {values[3]})")
-            print(f"SQCQ Sensor Information for: {sensor_id} - Result: {result}")
+            #print(f"DEBUG Sensor {sensor_id}: Invalid Azimuth/Elevation ({values[2]}, {values[3]})")
+            #print(f"SQCQ Sensor Information for: {sensor_id} - Result: {result}")
             result = "Invalid"
             # Sende trotzdem an SQCQ Dashboard
             sqcq_dashboard = get_sqcq_dashboard()
             if sqcq_dashboard:
                 sqcq_dashboard._fill_sensor_information_data(sensor_id, result)
+                self
             return
 
         values[2] = azimuth
@@ -251,7 +252,7 @@ class BaseDashboard(QWidget):
         try:
             values[4] = [int(x) for x in values[4].split()]
         except Exception:
-            print(f"DEBUG Sensor {sensor_id}: Invalid Blockage Status ({values[4]})")
+            #print(f"DEBUG Sensor {sensor_id}: Invalid Blockage Status ({values[4]})")
             result = "Invalid"
 
         # Valid Detections
@@ -273,12 +274,13 @@ class BaseDashboard(QWidget):
         ):
             result = "Invalid"
 
-        print(f"SQCQ Sensor Information for: {sensor_id} - Result: {result}")
+        #print(f"SQCQ Sensor Information for: {sensor_id} - Result: {result}")
         
         # Sende an globales SQCQ Dashboard
         sqcq_dashboard = get_sqcq_dashboard()
         if sqcq_dashboard:
             sqcq_dashboard._fill_sensor_information_data(sensor_id, result)
+        
         else:
             print("WARNING: SQCQ Dashboard nicht verfügbar!")
         

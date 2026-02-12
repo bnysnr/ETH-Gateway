@@ -166,6 +166,9 @@ class can_msg_sender():
         self.udp_sender_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         self.vdy_ethernet_parameter_arr = [0]
+        
+        # NEU: Sendeintervall 20ms (50 Hz)
+        self.SEND_INTERVAL = 0.020  # 20ms
 
     # CRC16 Algorithmus
     def calc_crc16(self, data: bytes) -> int:
@@ -222,7 +225,7 @@ class can_msg_sender():
     def init_udp_socket(self):
         """Erzeugt und bindet den UDP-Socket"""
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        #sock.setsockopt(socket.SOL_SOCKET, 25, self.INTERFACE)
+        sock.setsockopt(socket.SOL_SOCKET, 25, self.INTERFACE)      # zum Anzeigen der Egomotion Daten per Ethernet-Vektor Box die Zeile auskommentieren
         sock.bind((self.SOURCE_IP, self.SOURCE_PORT))
         return sock
 
@@ -271,7 +274,7 @@ class can_msg_sender():
 
         return header_part1 + header_part2 + someip_payload
 
-    # -------------------- Sender (OPTIMIERT) --------------------
+    # -------------------- Sender --------------------
     def send_udp_to_all(self, sock, payload):
         """Sendet Payload direkt an alle verfügbaren Radar-IPs ohne Threading"""
         current_radars = self.ip_scanner.get_available()
@@ -286,17 +289,14 @@ class can_msg_sender():
             except Exception as e:
                 print(f"Fehler beim Senden an {radar_ip}: {e}")
 
-    # -------------------- Hauptverarbeitung (OPTIMIERT + FIXED) --------------------
-    def process_can_messages(self, db, bus, sock, relevant_message_ids, signal_info, signal_names):
-        """Liest CAN, verarbeitet Signale und sendet an Radar-IPs - OPTIMIERT"""
+    # -------------------- NEU: CAN-Empfänger Thread --------------------
+    def can_receiver_thread(self, db, bus, relevant_message_ids, signal_names):
+        """Separater Thread: Empfängt CAN-Nachrichten und aktualisiert Werte"""
         vdy_signal_parameters = [0.0] * len(signal_names)
-        qf_signals_list = [0x00] * len(signal_names)
-        sqc = 0
-
+        
         try:
             while self.running:
-                # OPTIMIERT: Reduziertes Timeout von 200ms auf 10ms
-                msg = bus.recv(timeout=0.01)
+                msg = bus.recv(timeout=0.1)
                 if msg is None:
                     continue
 
@@ -304,54 +304,73 @@ class can_msg_sender():
                     continue
 
                 decoded = db.decode_message(msg.arbitration_id, msg.data)
-                updated = False
 
                 # Dynamisch über alle Signale iterieren
                 for idx, signal_name in enumerate(signal_names):
                     if signal_name in decoded:
                         value = decoded[signal_name]
                         
-                        # FIX: Geschwindigkeit direkt beim Empfang umrechnen (Index 7)
+                        # Geschwindigkeit direkt beim Empfang umrechnen (Index 7)
                         if idx == 7:
                             print(f"Speed vom CAN (km/h): {value}")
                             value = value / 3.6  # km/h -> m/s
                             print(f"Speed umgerechnet (m/s): {value}")
                         
-                        if idx == 3 or idx == 4 or idx ==5 or idx == 6:
+                        if idx == 3 or idx == 4 or idx == 5 or idx == 6:
                             print(f"Wheel Velocity (m/s): {value}")
                             value = value / 3.6  # km/h -> m/s
                             value += vdy_signal_parameters[7]
-                            print(f"Speed umgerechnet (m/s) nahc addition: {value}")
-
-
-
-
+                            print(f"Speed umgerechnet (m/s) nach addition: {value}")
 
                         vdy_signal_parameters[idx] = value
-                        updated = True
 
-                if not updated:
-                    continue
+                # Thread-sicher aktualisieren
+                with self.lock:
+                    self.vhc_can_val_arr = vdy_signal_parameters.copy()
 
-                # SOME/IP Nachricht aufbauen und senden
+        except Exception as e:
+            print(f"CAN Receiver Fehler: {e}")
+        finally:
+            bus.shutdown()
+
+    # -------------------- NEU: 20ms Sender Thread --------------------
+    def periodic_sender_thread(self, sock, signal_names):
+        """Separater Thread: Sendet alle 20ms die aktuellen Werte"""
+        qf_signals_list = [0x00] * len(signal_names)
+        sqc = 0
+        
+        try:
+            while self.running:
+                start_time = time.time()
+                
+                # Aktuelle Werte holen (thread-safe)
+                with self.lock:
+                    vdy_signal_parameters = self.vhc_can_val_arr.copy() if self.vhc_can_val_arr else [0.0] * len(signal_names)
+                
+                # SOME/IP Nachricht aufbauen
                 udp_payload = self.build_someip_payload(signal_names, vdy_signal_parameters, qf_signals_list, sqc)
                 print(f"UDP PAYLOAD Ausgabe: {vdy_signal_parameters}")
                 
-                # Thread-sicher aktualisieren
-                with self.lock:
-                    self.vhc_can_val_arr = vdy_signal_parameters
-                    float_payload = b''.join(struct.pack("<f", v) for v in vdy_signal_parameters)
-                    self.udp_sender_sock.sendto(float_payload, (self.UDP_OUT_IP, self.UDP_OUT_PORT))
-
-                # KRITISCH OPTIMIERT: Kein Threading, kein Sleep!
+                # An lokalen UDP-Port senden
+                float_payload = b''.join(struct.pack("<f", v) for v in vdy_signal_parameters)
+                self.udp_sender_sock.sendto(float_payload, (self.UDP_OUT_IP, self.UDP_OUT_PORT))
+                
+                # An alle Radars senden
                 self.send_udp_to_all(sock, udp_payload)
                 
                 sqc = (sqc + 1) % 256
+                
+                # Präzises Timing: Wartet genau bis 20ms vergangen sind
+                elapsed = time.time() - start_time
+                sleep_time = self.SEND_INTERVAL - elapsed
+                if sleep_time > 0:
+                    time.sleep(sleep_time)
+                else:
+                    print(f"⚠️ Warnung: Sendezyklen überschritten um {-sleep_time*1000:.1f}ms")
 
-        except KeyboardInterrupt:
-            print("\n\nBeendet")
+        except Exception as e:
+            print(f"Periodic Sender Fehler: {e}")
         finally:
-            bus.shutdown()
             sock.close()
 
     def get_vhc_can_val_arr(self):
@@ -365,7 +384,7 @@ class can_msg_sender():
             self.vhc_can_val_arr = arr
 
     def start(self):
-        """Startet den CAN-Sender in einem separaten Thread"""
+        """Startet den CAN-Sender in separaten Threads"""
         if self.running:
             print("Already running!")
             return
@@ -389,14 +408,24 @@ class can_msg_sender():
         
         self.running = True
         
-        # CAN-Verarbeitung in separatem Thread starten
+        # NEU: Zwei separate Threads
+        # Thread 1: CAN-Empfänger (liest CAN-Bus und aktualisiert Werte)
         can_thread = threading.Thread(
-            target=self.process_can_messages,
-            args=(db, bus, sock, relevant_message_ids, signal_info, signal_names),
+            target=self.can_receiver_thread,
+            args=(db, bus, relevant_message_ids, signal_names),
             daemon=False
         )
         can_thread.start()
-        print("CAN-Sender Thread gestartet (OPTIMIERT - Low Latency)")
+        print("CAN-Receiver Thread gestartet")
+        
+        # Thread 2: Periodischer Sender (sendet alle 20ms)
+        sender_thread = threading.Thread(
+            target=self.periodic_sender_thread,
+            args=(sock, signal_names),
+            daemon=False
+        )
+        sender_thread.start()
+        print("Periodic Sender Thread gestartet (20ms Intervall / 50 Hz)")
 
     def stop(self):
         """Stoppt den CAN-Sender"""
