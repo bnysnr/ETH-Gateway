@@ -297,7 +297,7 @@ class DataBinding:
 
     def _safe_hex_to_float(self, value, resolution, offset) -> tuple:
         """Konvertiert Hex-String zu Float mit Berechnung
-        Returniert (float_value, is_valid_bool)"""
+        Rückghabeform (float_value, is_valid_bool)"""
         try:
             if value is None or value == "UNKNOWN":
                 return 0.0, False

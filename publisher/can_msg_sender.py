@@ -167,8 +167,8 @@ class can_msg_sender():
 
         self.vdy_ethernet_parameter_arr = [0]
         
-        # NEU: Sendeintervall 20ms (50 Hz)
-        self.SEND_INTERVAL = 0.020  # 20ms
+        # Sendeintervall 20ms
+        self.SEND_INTERVAL = 0.020
 
     # CRC16 Algorithmus
     def calc_crc16(self, data: bytes) -> int:
@@ -190,7 +190,7 @@ class can_msg_sender():
         """Gibt aktuell verfügbare Radar-IPs zurück"""
         return self.ip_scanner.get_available()
 
-    # -------------------- Initialisierung --------------------
+
     def load_dbc_and_signals(self):
         """Lädt DBC und ermittelt relevante CAN-IDs"""
         db = cantools.database.load_file(self.DBC_PATH)
@@ -229,7 +229,7 @@ class can_msg_sender():
         sock.bind((self.SOURCE_IP, self.SOURCE_PORT))
         return sock
 
-    # -------------------- SOME/IP Aufbau --------------------
+    # SOME/IP Aufbau
     def build_someip_payload(self, signal_names, vdy_signal_parameters, qf_signals_list, sqc):
         """Erstellt SOME/IP Payload dynamisch basierend auf signal_names"""
         float_signals_list = [self.float_to_uint32_le(v) for v in vdy_signal_parameters]
@@ -264,9 +264,7 @@ class can_msg_sender():
 
         for name, val in zip(signal_names, vdy_signal_parameters):
             print(f" {name:30s}: {val:10.3f}")
-        print('*' * 40)
-        print(f"Geschwindigkeit: {vdy_signal_parameters[7]}")
-
+        
         vdy_signal_parameters[3] += self.vdy_ethernet_parameter_arr[0]
         vdy_signal_parameters[4] += self.vdy_ethernet_parameter_arr[0]
         vdy_signal_parameters[5] += self.vdy_ethernet_parameter_arr[0]
@@ -274,9 +272,9 @@ class can_msg_sender():
 
         return header_part1 + header_part2 + someip_payload
 
-    # -------------------- Sender --------------------
+    # Sender
     def send_udp_to_all(self, sock, payload):
-        """Sendet Payload direkt an alle verfügbaren Radar-IPs ohne Threading"""
+        """Sendet erstellte Payload direkt an alle verfügbaren Radar-IPs ohne Threading"""
         current_radars = self.ip_scanner.get_available()
         
         if not current_radars:
@@ -312,16 +310,11 @@ class can_msg_sender():
                         
                         # Geschwindigkeit direkt beim Empfang umrechnen (Index 7)
                         if idx == 7:
-                            print(f"Speed vom CAN (km/h): {value}")
-                            value = value / 3.6  # km/h -> m/s
-                            print(f"Speed umgerechnet (m/s): {value}")
+                            value = value / 3.6  # Speed from km/h to m/s
                         
                         if idx == 3 or idx == 4 or idx == 5 or idx == 6:
-                            print(f"Wheel Velocity (m/s): {value}")
-                            value = value / 3.6  # km/h -> m/s
+                            value = value / 3.6  # Value from km/h to m/s
                             value += vdy_signal_parameters[7]
-                            print(f"Speed umgerechnet (m/s) nach addition: {value}")
-
                         vdy_signal_parameters[idx] = value
 
                 # Thread-sicher aktualisieren
@@ -333,7 +326,7 @@ class can_msg_sender():
         finally:
             bus.shutdown()
 
-    # -------------------- NEU: 20ms Sender Thread --------------------
+    # 20ms Sender Thread
     def periodic_sender_thread(self, sock, signal_names):
         """Separater Thread: Sendet alle 20ms die aktuellen Werte"""
         qf_signals_list = [0x00] * len(signal_names)
@@ -366,7 +359,7 @@ class can_msg_sender():
                 if sleep_time > 0:
                     time.sleep(sleep_time)
                 else:
-                    print(f"⚠️ Warnung: Sendezyklen überschritten um {-sleep_time*1000:.1f}ms")
+                    print(f"Warnung: Sendezyklen überschritten um {-sleep_time*1000:.1f}ms")
 
         except Exception as e:
             print(f"Periodic Sender Fehler: {e}")
@@ -408,7 +401,6 @@ class can_msg_sender():
         
         self.running = True
         
-        # NEU: Zwei separate Threads
         # Thread 1: CAN-Empfänger (liest CAN-Bus und aktualisiert Werte)
         can_thread = threading.Thread(
             target=self.can_receiver_thread,
@@ -441,6 +433,6 @@ if __name__ == "__main__":
         while True:
             time.sleep(5)
             available = obj.get_available_radar_ips()
-            print(f"\n[Status] Aktive Radars: {len(available)} - {available}")
+            print(f"Aktive Radarsensoren: {len(available)} - {available}")
     except KeyboardInterrupt:
         obj.stop()

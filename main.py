@@ -124,19 +124,12 @@ class MainWindow(QMainWindow):
         self.btn_srr_front.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(1))
         self.btn_srr_rear.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(2))
         self.btn_ars_front_rear.clicked.connect(lambda: self.stacked_widget.setCurrentIndex(3))
-        
-        # MainWindow-Einstellungen
-        #self.setWindowTitle(self.pages[1].windowTitle())
-        #self.setFixedSize(self.pages[1].width(), self.pages[1].height() + 50)
-        
-        self.stacked_widget.currentChanged.connect(self.on_page_changed)
 
+        self.stacked_widget.currentChanged.connect(self.on_page_changed)
 
         # Startseite
         self.on_page_changed(0)
         self.stacked_widget.setCurrentIndex(0)
-
-
 
         # Egomotion Distributor erstellen
         self.egomotion_distributor = EgomotionDistributor()
@@ -146,6 +139,7 @@ class MainWindow(QMainWindow):
 
 
     def on_page_changed(self, index):
+        """Dynamisches wechseln der jeweiligen Fenstergröße"""
         if index == 0:
             self.resize(*self.SIZE_SQCQ)
         else:
@@ -153,7 +147,6 @@ class MainWindow(QMainWindow):
 
     def _start_threads(self):
         """Startet alle Threads für alle Dashboard-Seiten"""
-        # CAN Message Sender (global für alle Sensoren)
         can_sender = can_msg_sender()
         can_thread = threading.Thread(target=can_sender.start, daemon=True)
         can_thread.start()
