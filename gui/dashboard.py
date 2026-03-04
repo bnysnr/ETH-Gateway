@@ -382,8 +382,13 @@ class BaseDashboard(QWidget):
                             for response_ip, value in gen:
                                 buffer.append(value)
 
+                        buffer_2_formatted = ''.join(buffer[2][::-1]) 
+                        buffer_2_formatted_decimal = int(buffer_2_formatted, 16)
+
+                        # interne Abfrage ob der Sensor kalibriert ist
                         if len(buffer) == 6:
-                            if buffer[1] == 3 and buffer[2] is not None:
+                            buffer_1_decimal = int(buffer[1][0], 16)
+                            if buffer_1_decimal == 3 and buffer_2_formatted_decimal is not None:
                                 buffer.append(True)
                             else:
                                 buffer.append(False)

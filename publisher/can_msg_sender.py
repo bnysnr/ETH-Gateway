@@ -262,8 +262,8 @@ class can_msg_sender():
         someip_length = len(header_part2) + len(someip_payload)
         header_part1 = struct.pack("!II", message_id, someip_length)
 
-        for name, val in zip(signal_names, vdy_signal_parameters):
-            print(f" {name:30s}: {val:10.3f}")
+        #for name, val in zip(signal_names, vdy_signal_parameters):
+            #print(f" {name:30s}: {val:10.3f}")
         
         vdy_signal_parameters[3] += self.vdy_ethernet_parameter_arr[0]
         vdy_signal_parameters[4] += self.vdy_ethernet_parameter_arr[0]
@@ -342,7 +342,7 @@ class can_msg_sender():
                 
                 # SOME/IP Nachricht aufbauen
                 udp_payload = self.build_someip_payload(signal_names, vdy_signal_parameters, qf_signals_list, sqc)
-                print(f"UDP PAYLOAD Ausgabe: {vdy_signal_parameters}")
+                #print(f"UDP PAYLOAD Ausgabe: {vdy_signal_parameters}")
                 
                 # An lokalen UDP-Port senden
                 float_payload = b''.join(struct.pack("<f", v) for v in vdy_signal_parameters)
