@@ -9,10 +9,11 @@ UDP_PORT = 40000
 INTERFACE_IP = '192.168.16.5'
 
 
-SENSOR_TIMEOUT = 1  # Sekunden ohne Daten = Fehler
+SENSOR_TIMEOUT = 1  
 
 
 class radar_status_reader():
+    """Script welches die Radarstatuswerte über UDP ausliest und zurückgibt"""
     def __init__(self):
         super().__init__()
 

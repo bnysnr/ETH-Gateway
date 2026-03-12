@@ -26,7 +26,7 @@ class AvailableSensors:
     ALLOWED_IPS = {"192.168.16.11", "192.168.16.12", "192.168.16.13", "192.168.16.14", "192.168.16.15", "192.168.16.16"}
     MCAST_GRP = '239.22.0.3'
     UDP_PORT = 40000
-    INTERFACE_IP = '192.168.16.5'
+    INTERFACE_IP = '192.168.16.5'       # IP-Adresse vom Raspberry Pi
     
     def __init__(self):
         self.sensors = {}
@@ -123,7 +123,7 @@ class AvailableSensors:
                 print(f"{len(self.available_ips)} Radare gefunden: {self.available_ips}")
                 return True
             time.sleep(0.2)
-        print(" Keine Radare gefunden!")
+        print("Keine Radare gefunden!")
         return False
 
 
@@ -287,7 +287,7 @@ class can_msg_sender():
             except Exception as e:
                 print(f"Fehler beim Senden an {radar_ip}: {e}")
 
-    # -------------------- NEU: CAN-Empfänger Thread --------------------
+    # CAN-Empfänger Thread
     def can_receiver_thread(self, db, bus, relevant_message_ids, signal_names):
         """Separater Thread: Empfängt CAN-Nachrichten und aktualisiert Werte"""
         vdy_signal_parameters = [0.0] * len(signal_names)
@@ -342,8 +342,7 @@ class can_msg_sender():
                 
                 # SOME/IP Nachricht aufbauen
                 udp_payload = self.build_someip_payload(signal_names, vdy_signal_parameters, qf_signals_list, sqc)
-                #print(f"UDP PAYLOAD Ausgabe: {vdy_signal_parameters}")
-                
+                                
                 # An lokalen UDP-Port senden
                 float_payload = b''.join(struct.pack("<f", v) for v in vdy_signal_parameters)
                 self.udp_sender_sock.sendto(float_payload, (self.UDP_OUT_IP, self.UDP_OUT_PORT))

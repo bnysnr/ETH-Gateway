@@ -1,9 +1,3 @@
-"""
-Script zum Auslesen der gesendetetn Egomotion Daten und der jeweiligen Statuswerte
-02.12.25: Eventuell ist das Script aktuell unrelevant, da Funktion schon in der Main implementiert ist
-"""
-
-
 import sys
 import os
 import time

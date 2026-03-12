@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from .functions import apply_font_to_table
 
 class GenericSensorInformationTable(QFrame):
+    """Generischer Seitenaufbau inklkusive Tabelle, Elementen und Position für die Sensorinformation Tabelle"""
     
     def __init__(self, parent, gui_font, title, row_labels, columns, geometry_func):
         super().__init__(parent)

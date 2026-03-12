@@ -1,5 +1,3 @@
-# Script welches die UDP nachrichten auswertet und die gewünschten Sensorinformationen speichert
-
 import socket
 import struct
 import sys
@@ -8,12 +6,13 @@ import time
 
 MCAST_GRP = '239.22.0.3'
 UDP_PORT = 40000
-INTERFACE_IP = '192.168.16.5'
+INTERFACE_IP = '192.168.16.5'           # IP-Adresse vom Raspberry Pi
 
-SENSOR_TIMEOUT = 2  # 2 Sekunden ohne Daten = Fehler
+SENSOR_TIMEOUT = 2 
 
 
 class SensorInformationReader():
+    """Script zum Auslesen der Sensordaten"""
     def __init__(self):
         super().__init__()
 
@@ -29,9 +28,7 @@ class SensorInformationReader():
             
         
     def run(self, sensor_ip_address, service_id, method_id, bitposition, bitsize):
-        """
-        Wartet nur auf UDP-Pakete vom spezifischen Sensor (IP-Filterung)
-        """
+        # Wartet nur auf UDP-Pakete vom spezifischen Sensor (IP-Filterung)
         try:
             timeout_time = time.time() + SENSOR_TIMEOUT
             
@@ -40,7 +37,7 @@ class SensorInformationReader():
                     data, addr = self.sock.recvfrom(4096)
                     sender_ip = addr[0]
                     
-                    # WICHTIG: Nur Pakete vom gesuchten Sensor verarbeiten
+                    # Nur Pakete vom gesuchten Sensor werden verarbeitet
                     if sender_ip != sensor_ip_address:
                         continue
                     
@@ -74,14 +71,3 @@ class SensorInformationReader():
 
     def decode_values(self, hexstring):
         return [hexstring[i:i+2] for i in range(0, len(hexstring), 2)]
-    
-"""   
-
-if __name__ == "__main__":
-    sensor_obj = SensorInformationReader()
-    while True:
-        result = sensor_obj.run("192.168.16.13", "0007", "1000", 1311, 8)
-        for a in result:
-            print(a)
-
-"""
