@@ -10,7 +10,7 @@ import time
 
 
 class EgomotionDistributor:
-    """Verteilt Egomotion-Daten von einem Socket an alle Dashboards"""
+    """Verteilt Egomotion-Daten von einem Socket an alle Dashboards """
     def __init__(self):
         self.dashboards = []
         self.thread_running = True
